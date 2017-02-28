@@ -1,0 +1,4 @@
+sceneSetups:
+- path: Assets/GeoPark-Karte.unity
+  isLoaded: 1
+  isActive: 1
