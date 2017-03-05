@@ -70,7 +70,7 @@ public class FallingDeep : MonoBehaviour {
             cam.GetComponent<Rigidbody>().isKinematic = false;
         }
 
-        if (yPosition < -40) //_____________________________________________________ RESET ____________________________________________
+        if (yPosition < -200) //_____________________________________________________ RESET ____________________________________________
         {
             // resets positions of Schollen and isKinematic to stop them falling
             for (int i = 0; i < schollen.Length; i++)

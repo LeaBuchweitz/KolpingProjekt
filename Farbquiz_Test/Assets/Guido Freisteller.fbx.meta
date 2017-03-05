@@ -1,0 +1,198 @@
+fileFormatVersion: 2
+guid: bff7afafeeaa0214cb86148f6e736a9b
+timeCreated: 1488752450
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: 10
+    100002: 11
+    100004: 12
+    100006: 13
+    100008: 1___B___
+    100010: 2
+    100012: 3
+    100014: 4
+    100016: 5
+    100018: 6
+    100020: 7
+    100022: 8
+    100024: 9
+    100026: Camera
+    100028: Camera_Circle
+    100030: Camera_target
+    100032: Connect
+    100034: Farbmischungen
+    100036: Fold_My_Design____Nitroman
+    100038: G
+    100040: Guides
+    100042: //RootNode
+    100044: Guido_Freisteller
+    100046: Guido_Freisteller_Kontraste
+    100048: Kameras
+    100050: Kameras_alt
+    100052: Null
+    100054: Null_1
+    100056: Null_2
+    100058: Null_3
+    100060: Null_3_2
+    100062: Null_4
+    100064: Null_5
+    100066: Null_6
+    100068: Null_7
+    100070: Orbit_Camera
+    100072: P_12
+    100074: P_12_10
+    100076: P_12_11
+    100078: P_12_12
+    100080: P_12_13
+    100082: P_12_2
+    100084: P_12_3
+    100086: P_12_4
+    100088: P_12_5
+    100090: P_12_6
+    100092: P_12_7
+    100094: P_12_8
+    100096: P_12_9
+    100098: Part1
+    100100: Part2
+    100102: "R\xFCckseite_Farbkugelraum"
+    100104: "R\xFCckseite_Farbkugelraum_vor_Bildelementen"
+    100106: "R\xFCckseite_Steuer_Glaskugel"
+    100108: Splines
+    100110: Test
+    100112: Zylinder
+    400000: 10
+    400002: 11
+    400004: 12
+    400006: 13
+    400008: 1___B___
+    400010: 2
+    400012: 3
+    400014: 4
+    400016: 5
+    400018: 6
+    400020: 7
+    400022: 8
+    400024: 9
+    400026: Camera
+    400028: Camera_Circle
+    400030: Camera_target
+    400032: Connect
+    400034: Farbmischungen
+    400036: Fold_My_Design____Nitroman
+    400038: G
+    400040: Guides
+    400042: //RootNode
+    400044: Guido_Freisteller
+    400046: Guido_Freisteller_Kontraste
+    400048: Kameras
+    400050: Kameras_alt
+    400052: Null
+    400054: Null_1
+    400056: Null_2
+    400058: Null_3
+    400060: Null_3_2
+    400062: Null_4
+    400064: Null_5
+    400066: Null_6
+    400068: Null_7
+    400070: Orbit_Camera
+    400072: P_12
+    400074: P_12_10
+    400076: P_12_11
+    400078: P_12_12
+    400080: P_12_13
+    400082: P_12_2
+    400084: P_12_3
+    400086: P_12_4
+    400088: P_12_5
+    400090: P_12_6
+    400092: P_12_7
+    400094: P_12_8
+    400096: P_12_9
+    400098: Part1
+    400100: Part2
+    400102: "R\xFCckseite_Farbkugelraum"
+    400104: "R\xFCckseite_Farbkugelraum_vor_Bildelementen"
+    400106: "R\xFCckseite_Steuer_Glaskugel"
+    400108: Splines
+    400110: Test
+    400112: Zylinder
+    2300000: Connect
+    2300002: Guido_Freisteller
+    2300004: Zylinder
+    3300000: Connect
+    3300002: Guido_Freisteller
+    3300004: Zylinder
+    4300000: Connect
+    4300002: Guido_Freisteller
+    4300004: Zylinder
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
