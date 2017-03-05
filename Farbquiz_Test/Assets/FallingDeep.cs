@@ -25,7 +25,8 @@ public class FallingDeep : MonoBehaviour {
 	void Start () {
 
         // reference to one Scholle
-        defaultY = GameObject.Find("KameraScholle");
+        //defaultY = GameObject.Find("KameraScholle");
+        defaultY = GameObject.Find("Start");
 
         // gets reference and position to cam
         cam = GameObject.Find("CardboardMain");
@@ -151,6 +152,7 @@ public class FallingDeep : MonoBehaviour {
                 {
                     // gets position of the object (at Index i) for end of Jump
                     endJump = schollenPosition[i];
+                    Debug.Log(endJump);
                 }
             }
 

@@ -64,11 +64,11 @@ public class CalculateJumpParab : MonoBehaviour {
 
     public void calculateLocalParab(Vector3 start, Vector3 end)
     {
-        //Debug.Log("Start: " + start + " Ende: " + end);
+        Debug.Log("Start: " + start + " Ende: " + end);
 
         // Richtungsvektor end - start
         Vector3 direction = new Vector3(end.x + start.x, end.y - start.y, end.z - start.z);
-        //Debug.Log("Richtungsvektor: " + direction);
+        Debug.Log("Richtungsvektor: " + direction);
 
         // Mittelpunkt der Animation: start-Vektor + (0.5 * Richtungsvektor) --- max Höhe des Sprungs: y + 1.3
         middle = new Vector3(start.x + (0.5f * direction.x), start.y + (0.5f * direction.y) + 1.3f, start.z + (0.5f * direction.z));
