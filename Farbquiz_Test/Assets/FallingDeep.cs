@@ -15,9 +15,11 @@ public class FallingDeep : MonoBehaviour {
     Vector3 endJump;
     float yPosition;
     float timer;
+    float timerFall;
     float timerToAnswer;
     bool correctAnswer;
     bool jump;
+    bool fallingStarted;
     string canvasObj;
     string scholleObj;
 
@@ -33,9 +35,10 @@ public class FallingDeep : MonoBehaviour {
         camPosition = cam.GetComponent<Transform>().position;
 
         // sets timer and begin of timer
-        timer = timerToAnswer = 0.0f;
+        timer = timerToAnswer = timerFall = 0.0f;
         correctAnswer = true;
         jump = false;
+        fallingStarted = false;
         canvasObj = "Canvas";
         scholleObj = "Scholle";
 
@@ -48,26 +51,46 @@ public class FallingDeep : MonoBehaviour {
         // checks y position if Schollen have already fallen deep enough
         yPosition = defaultY.GetComponent<Transform>().position.y;
 
+        
         // starts timer for falling __________________________________________ WRONG _________________________________________________________________________________________________________________
         if (!correctAnswer)
         {
             timer += Time.deltaTime;
         }
 
-        // start falling of all Schollen  _____________________________ FALLING __________________________________________________
+        if (fallingStarted)
+        {
+            timerFall += Time.deltaTime;
+        }
+        
+        // starts jump although answer is wrong __________________________________ STARTS FALLING WITH A JUMP _______________________________________________________
         if (timer > 1.8)
+        {
+            // calls function in CalculateJumpParab to animate jump to correct Scholle
+            cam.GetComponent<CalculateJumpParab>().calculateLocalParab(camPosition, new Vector3(endJump.x, endJump.y + 0.5f, endJump.z));
+
+            fallingStarted = true;
+            //startFalling();
+
+            reset();
+        }
+
+        // starts cam falling
+        if (timerFall > 1.5)
+        {
+            cam.GetComponent<Rigidbody>().isKinematic = false;
+            fallingStarted = false;
+            timerFall = 0.0f;
+        }
+
+        // start falling of all Schollen  _____________________________ FALLING __________________________________________________
+        if (timerFall > 1.0)
         {
             foreach (GameObject objct in schollen)
             {
                 objct.GetComponent<Rigidbody>().isKinematic = false;
                 GameObject.Find(canvasObj).GetComponentInChildren<Text>().color = Color.red;
             }
-        }
-
-        // starts cam falling
-        if (timer > 1.95)
-        {
-            cam.GetComponent<Rigidbody>().isKinematic = false;
         }
 
         if (yPosition < -200) //_____________________________________________________ RESET ____________________________________________
@@ -83,16 +106,7 @@ public class FallingDeep : MonoBehaviour {
             cam.GetComponent<Rigidbody>().isKinematic = true;
             cam.GetComponent<Transform>().position = camPosition;
 
-            // disables the EventTrigger so that the answer can't be chosen anymore
-            canvas = GameObject.FindGameObjectsWithTag("Canvas");
-            foreach (GameObject obj in canvas)
-            {
-                obj.GetComponent<EventTrigger>().enabled = false;
-            }
-
-            // reset
-            correctAnswer = true;
-            timer = 0.0f;
+            reset();
             canvasObj = "Canvas";
         }
         //________________________________________________________________________________________________________________________________________________________________________________________________
@@ -107,22 +121,30 @@ public class FallingDeep : MonoBehaviour {
             // calls function in CalculateJumpParab to animate jump to correct Scholle
             cam.GetComponent<CalculateJumpParab>().calculateLocalParab(camPosition, new Vector3(endJump.x, endJump.y + 0.5f, endJump.z));
 
-            // reset 
+            reset();
             canvasObj = "Canvas";
-            scholleObj = "Scholle";
-            timerToAnswer = 0.0f;
-            jump = false;
-
-            // disables the EventTrigger so that the answer can't be chosen anymore
-            canvas = GameObject.FindGameObjectsWithTag("Canvas");
-            foreach (GameObject obj in canvas)
-            {
-                obj.GetComponent<EventTrigger>().enabled = false;
-            }
         }
+
         //_________________________________________________________________________________________________________________________________________________________________________________________________
     }
 
+    public void reset()
+    {
+        // sets all values back to start
+        scholleObj = "Scholle";
+        timerToAnswer = timer = 0.0f;
+        jump = false;
+        correctAnswer = true;
+
+        // disables the EventTrigger so that the answer can't be chosen anymore
+        canvas = GameObject.FindGameObjectsWithTag("Canvas");
+        foreach (GameObject obj in canvas)
+        {
+            obj.GetComponent<EventTrigger>().enabled = false;
+        }
+    }
+
+    // Gaze is on this Object
     public void gravityOn(string correct_Name)
     {
         // gets all possible Schollen everytime gravityOn is called
@@ -145,17 +167,7 @@ public class FallingDeep : MonoBehaviour {
             // sets string of current object of Canvas and Scholle
             canvasObj += correct_Name.ToCharArray().GetValue(1).ToString();
             scholleObj += correct_Name.ToCharArray().GetValue(1).ToString();
-            // searches current object in Schollen and gets index
-            for(int i = 0; i < schollen.Length; i++)
-            {
-                if(schollen[i].name.Equals(scholleObj))
-                {
-                    // gets position of the object (at Index i) for end of Jump
-                    endJump = schollenPosition[i];
-                    Debug.Log(endJump);
-                }
-            }
-
+            
             // starts timerToAnswer to start jump
             jump = true;           
 
@@ -164,13 +176,28 @@ public class FallingDeep : MonoBehaviour {
         {
             // sets string of current object and starts begin for timer
             canvasObj += correct_Name;
+            scholleObj += correct_Name;
+            Debug.Log("Schollenname: " + scholleObj);
             correctAnswer = false;
         }
+
+        // searches current object in Schollen and gets index
+        for (int i = 0; i < schollen.Length; i++)
+        {
+            if (schollen[i].name.Equals(scholleObj))
+            {
+                // gets position of the object (at Index i) for end of Jump
+                endJump = schollenPosition[i];
+                Debug.Log(endJump);
+            }
+        }
+
 
         // sets color of the answer to green
         GameObject.Find(canvasObj).GetComponentInChildren<Text>().color = Color.green;
     }
 
+    // Gaze no longer on this object
     public void gravityOff()
     {
         // sets timer only back if Schollen are not falling
@@ -183,5 +210,11 @@ public class FallingDeep : MonoBehaviour {
             canvasObj = "Canvas";
             scholleObj = "Scholle";
         }
+    }
+
+    public void startFalling()
+    {
+        
+        
     }
 }

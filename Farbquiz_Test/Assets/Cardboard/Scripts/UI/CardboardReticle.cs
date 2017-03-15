@@ -42,7 +42,7 @@ public class CardboardReticle : MonoBehaviour, ICardboardGazePointer {
   private const float kReticleMinOuterAngle = 0.5f;
   // Angle at which to expand the reticle when intersecting with an object
   // (in degrees).
-  private const float kReticleGrowthAngle = 1.5f;
+  private const float kReticleGrowthAngle = 0.7f;
 
   // Minimum distance of the reticle (in meters).
   private const float kReticleDistanceMin = 0.45f;
