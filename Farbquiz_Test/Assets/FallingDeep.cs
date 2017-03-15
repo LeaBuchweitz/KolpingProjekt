@@ -6,26 +6,35 @@ using UnityEngine.EventSystems;
 
 public class FallingDeep : MonoBehaviour {
 
-    GameObject defaultY;
-    GameObject cam;
-    GameObject[] schollen;
-    GameObject[] canvas;
-    Vector3[] schollenPosition;
-    Vector3 camPosition;
-    Vector3 endJump;
-    float yPosition;
-    float timer;
-    float timerToAnswer;
-    bool correctAnswer;
-    bool jump;
-    string canvasObj;
-    string scholleObj;
+    private GameObject defaultY;
+    private GameObject cam;
+    private List<GameObject> allQuestions;
+    private GameObject[] schollen;
+    private List<GameObject> schollenHilfe;
+    private List<GameObject> canvasHilfe;
+    private GameObject[] canvas;
+    private Vector3[] schollenPosition;
+    private Vector3 camPosition;
+    private Vector3 endJump;
+    private float yPosition;
+    private float timer;
+    private float timerFall;
+    private float timerToAnswer;
+    private bool correctAnswer;
+    private bool jump;
+    private bool fallingStarted;
+    private string canvasObj;
+    private string scholleObj;
 
 	// Use this for initialization
 	void Start () {
 
+        // reference to all question prefabs
+        allQuestions = new List<GameObject> { GameObject.Find("1-Hell-Dunkel-Scholle-Frage-Antw-Bild"), GameObject.Find("2-Komplemantaer-Scholle-Frage-Antw-Bild") }; //, GameObject.Find("3-Simultan-Scholle-Frage-Antw-Bild"),
+            // GameObject.Find("4-Unbunt-Bunt-Scholle-Frage-Antw-Bild"), GameObject.Find("5-Farbe-an-sich-Scholle-Frage-Antw-Bild"), GameObject.Find("6-Warm-Kalt-Scholle-Frage-Antw-Bild"),
+            // GameObject.Find("7-Quantitaet-Scholle-Frage-Antw-Bild"), GameObject.Find("8-Qualitaet-Scholle-Frage-Antw-Bild") };
+
         // reference to one Scholle
-        //defaultY = GameObject.Find("KameraScholle");
         defaultY = GameObject.Find("Start");
 
         // gets reference and position to cam
@@ -33,11 +42,14 @@ public class FallingDeep : MonoBehaviour {
         camPosition = cam.GetComponent<Transform>().position;
 
         // sets timer and begin of timer
-        timer = timerToAnswer = 0.0f;
+        timer = timerToAnswer = timerFall = 0.0f;
         correctAnswer = true;
         jump = false;
+        fallingStarted = false;
         canvasObj = "Canvas";
         scholleObj = "Scholle";
+
+        schollenHilfe = new List<GameObject>();
 
     }
 
@@ -48,26 +60,46 @@ public class FallingDeep : MonoBehaviour {
         // checks y position if Schollen have already fallen deep enough
         yPosition = defaultY.GetComponent<Transform>().position.y;
 
+        
         // starts timer for falling __________________________________________ WRONG _________________________________________________________________________________________________________________
         if (!correctAnswer)
         {
             timer += Time.deltaTime;
         }
 
-        // start falling of all Schollen  _____________________________ FALLING __________________________________________________
+        if (fallingStarted)
+        {
+            timerFall += Time.deltaTime;
+        }
+        
+        // starts jump although answer is wrong __________________________________ STARTS FALLING WITH A JUMP _______________________________________________________
         if (timer > 1.8)
+        {
+            // calls function in CalculateJumpParab to animate jump to correct Scholle
+            cam.GetComponent<CalculateJumpParab>().calculateLocalParab(camPosition, new Vector3(endJump.x, endJump.y + 0.5f, endJump.z));
+
+            fallingStarted = true;
+            //startFalling();
+
+            reset();
+        }
+
+        // starts cam falling
+        if (timerFall > 1.5)
+        {
+            cam.GetComponent<Rigidbody>().isKinematic = false;
+            fallingStarted = false;
+            timerFall = 0.0f;
+        }
+
+        // start falling of all Schollen  _____________________________ FALLING __________________________________________________
+        if (timerFall > 1.0)
         {
             foreach (GameObject objct in schollen)
             {
                 objct.GetComponent<Rigidbody>().isKinematic = false;
                 GameObject.Find(canvasObj).GetComponentInChildren<Text>().color = Color.red;
             }
-        }
-
-        // starts cam falling
-        if (timer > 1.95)
-        {
-            cam.GetComponent<Rigidbody>().isKinematic = false;
         }
 
         if (yPosition < -200) //_____________________________________________________ RESET ____________________________________________
@@ -83,17 +115,10 @@ public class FallingDeep : MonoBehaviour {
             cam.GetComponent<Rigidbody>().isKinematic = true;
             cam.GetComponent<Transform>().position = camPosition;
 
-            // disables the EventTrigger so that the answer can't be chosen anymore
-            canvas = GameObject.FindGameObjectsWithTag("Canvas");
-            foreach (GameObject obj in canvas)
-            {
-                obj.GetComponent<EventTrigger>().enabled = false;
-            }
-
-            // reset
-            correctAnswer = true;
-            timer = 0.0f;
+            reset();
             canvasObj = "Canvas";
+
+            resetGame();
         }
         //________________________________________________________________________________________________________________________________________________________________________________________________
 
@@ -107,26 +132,71 @@ public class FallingDeep : MonoBehaviour {
             // calls function in CalculateJumpParab to animate jump to correct Scholle
             cam.GetComponent<CalculateJumpParab>().calculateLocalParab(camPosition, new Vector3(endJump.x, endJump.y + 0.5f, endJump.z));
 
-            // reset 
+            reset();
             canvasObj = "Canvas";
-            scholleObj = "Scholle";
-            timerToAnswer = 0.0f;
-            jump = false;
-
-            // disables the EventTrigger so that the answer can't be chosen anymore
-            canvas = GameObject.FindGameObjectsWithTag("Canvas");
-            foreach (GameObject obj in canvas)
-            {
-                obj.GetComponent<EventTrigger>().enabled = false;
-            }
         }
+
         //_________________________________________________________________________________________________________________________________________________________________________________________________
     }
 
+    public void reset()
+    {
+        // sets all values back to start
+        scholleObj = "Scholle";
+        timerToAnswer = timer = 0.0f;
+        jump = false;
+        correctAnswer = true;
+
+        // disables the EventTrigger so that the answer can't be chosen anymore
+
+        /* NOCH ZU TUN!!!!!!!!!!!!!!!!!!
+        Transform thisQuestion = allQuestions[0].transform;
+        foreach (Transform child in thisQuestion)
+        {
+            if (child.CompareTag("Canvas"))
+            {
+                Destroy(child);
+            }
+        }
+        */
+
+        //canvas = canvasHilfe.ToArray();
+        canvas = GameObject.FindGameObjectsWithTag("Canvas");
+        foreach (GameObject obj in canvas)
+        {
+            obj.GetComponent<EventTrigger>().enabled = false;
+            Debug.Log(obj);
+        }
+
+        allQuestions.RemoveAt(0);
+        Debug.Log("allQuestions: " + allQuestions.Count);
+    }
+
+    // Gaze is on this Object
     public void gravityOn(string correct_Name)
     {
+        Transform thisQuestion = null; 
+
+        if (allQuestions != null)
+        {
+            thisQuestion = allQuestions[0].transform;
+            Debug.Log(thisQuestion.name);
+        } else
+        {
+            Debug.Log("Game is over and won!");
+        }
+
         // gets all possible Schollen everytime gravityOn is called
-        schollen = GameObject.FindGameObjectsWithTag("Scholle");
+        foreach(Transform child in thisQuestion)
+        {
+            if(child.CompareTag("Scholle"))
+            {
+                schollenHilfe.Add(child.gameObject);
+            }
+        }
+        // Startscholle noch dazu 
+        schollenHilfe.Add(defaultY);
+        schollen = schollenHilfe.ToArray();
 
         // gets position of all Schollen only if they're not falling
         if(schollen[0].GetComponent<Rigidbody>().isKinematic)
@@ -135,6 +205,7 @@ public class FallingDeep : MonoBehaviour {
             schollenPosition = new Vector3[schollen.Length];
             for (int i = 0; i < schollen.Length; i++)
             {
+                Debug.Log(schollen[i]);
                 schollenPosition[i] = schollen[i].GetComponent<Transform>().position;
             }
         }
@@ -145,17 +216,7 @@ public class FallingDeep : MonoBehaviour {
             // sets string of current object of Canvas and Scholle
             canvasObj += correct_Name.ToCharArray().GetValue(1).ToString();
             scholleObj += correct_Name.ToCharArray().GetValue(1).ToString();
-            // searches current object in Schollen and gets index
-            for(int i = 0; i < schollen.Length; i++)
-            {
-                if(schollen[i].name.Equals(scholleObj))
-                {
-                    // gets position of the object (at Index i) for end of Jump
-                    endJump = schollenPosition[i];
-                    Debug.Log(endJump);
-                }
-            }
-
+            
             // starts timerToAnswer to start jump
             jump = true;           
 
@@ -164,13 +225,26 @@ public class FallingDeep : MonoBehaviour {
         {
             // sets string of current object and starts begin for timer
             canvasObj += correct_Name;
+            scholleObj += correct_Name;
             correctAnswer = false;
         }
+
+        // searches current object in Schollen and gets index
+        for (int i = 0; i < schollen.Length; i++)
+        {
+            if (schollen[i].name.Equals(scholleObj))
+            {
+                // gets position of the object (at Index i) for end of Jump
+                endJump = schollenPosition[i];
+            }
+        }
+
 
         // sets color of the answer to green
         GameObject.Find(canvasObj).GetComponentInChildren<Text>().color = Color.green;
     }
 
+    // Gaze no longer on this object
     public void gravityOff()
     {
         // sets timer only back if Schollen are not falling
@@ -183,5 +257,13 @@ public class FallingDeep : MonoBehaviour {
             canvasObj = "Canvas";
             scholleObj = "Scholle";
         }
+    }
+
+    public void resetGame()
+    {
+        // reference to all question prefabs
+        allQuestions = new List<GameObject> { GameObject.Find("1-Hell-Dunkel-Scholle-Frage-Antw-Bild"), GameObject.Find("2-Komplemantaer-Scholle-Frage-Antw-Bild") }; //, GameObject.Find("3-Simultan-Scholle-Frage-Antw-Bild"),
+                                            // GameObject.Find("4-Unbunt-Bunt-Scholle-Frage-Antw-Bild"), GameObject.Find("5-Farbe-an-sich-Scholle-Frage-Antw-Bild"), GameObject.Find("6-Warm-Kalt-Scholle-Frage-Antw-Bild"),
+                                            // GameObject.Find("7-Quantitaet-Scholle-Frage-Antw-Bild"), GameObject.Find("8-Qualitaet-Scholle-Frage-Antw-Bild") };
     }
 }
