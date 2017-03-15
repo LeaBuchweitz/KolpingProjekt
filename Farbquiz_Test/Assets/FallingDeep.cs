@@ -6,28 +6,35 @@ using UnityEngine.EventSystems;
 
 public class FallingDeep : MonoBehaviour {
 
-    GameObject defaultY;
-    GameObject cam;
-    GameObject[] schollen;
-    GameObject[] canvas;
-    Vector3[] schollenPosition;
-    Vector3 camPosition;
-    Vector3 endJump;
-    float yPosition;
-    float timer;
-    float timerFall;
-    float timerToAnswer;
-    bool correctAnswer;
-    bool jump;
-    bool fallingStarted;
-    string canvasObj;
-    string scholleObj;
+    private GameObject defaultY;
+    private GameObject cam;
+    private List<GameObject> allQuestions;
+    private GameObject[] schollen;
+    private List<GameObject> schollenHilfe;
+    private List<GameObject> canvasHilfe;
+    private GameObject[] canvas;
+    private Vector3[] schollenPosition;
+    private Vector3 camPosition;
+    private Vector3 endJump;
+    private float yPosition;
+    private float timer;
+    private float timerFall;
+    private float timerToAnswer;
+    private bool correctAnswer;
+    private bool jump;
+    private bool fallingStarted;
+    private string canvasObj;
+    private string scholleObj;
 
 	// Use this for initialization
 	void Start () {
 
+        // reference to all question prefabs
+        allQuestions = new List<GameObject> { GameObject.Find("1-Hell-Dunkel-Scholle-Frage-Antw-Bild"), GameObject.Find("2-Komplemantaer-Scholle-Frage-Antw-Bild") }; //, GameObject.Find("3-Simultan-Scholle-Frage-Antw-Bild"),
+            // GameObject.Find("4-Unbunt-Bunt-Scholle-Frage-Antw-Bild"), GameObject.Find("5-Farbe-an-sich-Scholle-Frage-Antw-Bild"), GameObject.Find("6-Warm-Kalt-Scholle-Frage-Antw-Bild"),
+            // GameObject.Find("7-Quantitaet-Scholle-Frage-Antw-Bild"), GameObject.Find("8-Qualitaet-Scholle-Frage-Antw-Bild") };
+
         // reference to one Scholle
-        //defaultY = GameObject.Find("KameraScholle");
         defaultY = GameObject.Find("Start");
 
         // gets reference and position to cam
@@ -41,6 +48,8 @@ public class FallingDeep : MonoBehaviour {
         fallingStarted = false;
         canvasObj = "Canvas";
         scholleObj = "Scholle";
+
+        schollenHilfe = new List<GameObject>();
 
     }
 
@@ -108,6 +117,8 @@ public class FallingDeep : MonoBehaviour {
 
             reset();
             canvasObj = "Canvas";
+
+            resetGame();
         }
         //________________________________________________________________________________________________________________________________________________________________________________________________
 
@@ -137,18 +148,55 @@ public class FallingDeep : MonoBehaviour {
         correctAnswer = true;
 
         // disables the EventTrigger so that the answer can't be chosen anymore
+
+        /* NOCH ZU TUN!!!!!!!!!!!!!!!!!!
+        Transform thisQuestion = allQuestions[0].transform;
+        foreach (Transform child in thisQuestion)
+        {
+            if (child.CompareTag("Canvas"))
+            {
+                Destroy(child);
+            }
+        }
+        */
+
+        //canvas = canvasHilfe.ToArray();
         canvas = GameObject.FindGameObjectsWithTag("Canvas");
         foreach (GameObject obj in canvas)
         {
             obj.GetComponent<EventTrigger>().enabled = false;
+            Debug.Log(obj);
         }
+
+        allQuestions.RemoveAt(0);
+        Debug.Log("allQuestions: " + allQuestions.Count);
     }
 
     // Gaze is on this Object
     public void gravityOn(string correct_Name)
     {
+        Transform thisQuestion = null; 
+
+        if (allQuestions != null)
+        {
+            thisQuestion = allQuestions[0].transform;
+            Debug.Log(thisQuestion.name);
+        } else
+        {
+            Debug.Log("Game is over and won!");
+        }
+
         // gets all possible Schollen everytime gravityOn is called
-        schollen = GameObject.FindGameObjectsWithTag("Scholle");
+        foreach(Transform child in thisQuestion)
+        {
+            if(child.CompareTag("Scholle"))
+            {
+                schollenHilfe.Add(child.gameObject);
+            }
+        }
+        // Startscholle noch dazu 
+        schollenHilfe.Add(defaultY);
+        schollen = schollenHilfe.ToArray();
 
         // gets position of all Schollen only if they're not falling
         if(schollen[0].GetComponent<Rigidbody>().isKinematic)
@@ -157,6 +205,7 @@ public class FallingDeep : MonoBehaviour {
             schollenPosition = new Vector3[schollen.Length];
             for (int i = 0; i < schollen.Length; i++)
             {
+                Debug.Log(schollen[i]);
                 schollenPosition[i] = schollen[i].GetComponent<Transform>().position;
             }
         }
@@ -177,7 +226,6 @@ public class FallingDeep : MonoBehaviour {
             // sets string of current object and starts begin for timer
             canvasObj += correct_Name;
             scholleObj += correct_Name;
-            Debug.Log("Schollenname: " + scholleObj);
             correctAnswer = false;
         }
 
@@ -188,7 +236,6 @@ public class FallingDeep : MonoBehaviour {
             {
                 // gets position of the object (at Index i) for end of Jump
                 endJump = schollenPosition[i];
-                Debug.Log(endJump);
             }
         }
 
@@ -212,9 +259,11 @@ public class FallingDeep : MonoBehaviour {
         }
     }
 
-    public void startFalling()
+    public void resetGame()
     {
-        
-        
+        // reference to all question prefabs
+        allQuestions = new List<GameObject> { GameObject.Find("1-Hell-Dunkel-Scholle-Frage-Antw-Bild"), GameObject.Find("2-Komplemantaer-Scholle-Frage-Antw-Bild") }; //, GameObject.Find("3-Simultan-Scholle-Frage-Antw-Bild"),
+                                            // GameObject.Find("4-Unbunt-Bunt-Scholle-Frage-Antw-Bild"), GameObject.Find("5-Farbe-an-sich-Scholle-Frage-Antw-Bild"), GameObject.Find("6-Warm-Kalt-Scholle-Frage-Antw-Bild"),
+                                            // GameObject.Find("7-Quantitaet-Scholle-Frage-Antw-Bild"), GameObject.Find("8-Qualitaet-Scholle-Frage-Antw-Bild") };
     }
 }
