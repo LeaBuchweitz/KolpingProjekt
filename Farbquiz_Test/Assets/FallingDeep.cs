@@ -61,8 +61,16 @@ public class FallingDeep : MonoBehaviour {
         // makes every question apart of the first invisible
         for(int i = 1; i < allQuestions.Count; i++) 
         {
+            foreach(Transform child in allQuestions[i].transform)
+            {
+                if(child.CompareTag("Canvas"))
+                {
+                    child.GetComponentInChildren<EventTrigger>().enabled = false;
+                }
+            }
             allQuestions[i].GetComponent<Transform>().localScale = new Vector3 (0,0,0);
-            allQuestions[i].GetComponentInChildren<EventTrigger>().enabled = false;
+            Debug.Log(i);
+            //allQuestions[i].GetComponent<MeshRenderer>().enabled = false;
         }
 
     }
@@ -72,7 +80,7 @@ public class FallingDeep : MonoBehaviour {
     {
 
         // checks y position if Schollen have already fallen deep enough
-        yPosition = defaultY.GetComponent<Transform>().position.y;
+        yPosition = cam.GetComponent<Transform>().position.y;
 
         
         // starts timer for falling __________________________________________ WRONG _________________________________________________________________________________________________________________
@@ -127,7 +135,7 @@ public class FallingDeep : MonoBehaviour {
 
             // resets cam position and isKinematic to stop it from falling
             cam.GetComponent<Rigidbody>().isKinematic = true;
-            cam.GetComponent<Transform>().position = camPosition;
+            cam.GetComponent<Transform>().position = defaultY.GetComponent<Transform>().position;
             cam.GetComponent<Transform>().rotation = camRotation;
 
             reset();
@@ -158,8 +166,16 @@ public class FallingDeep : MonoBehaviour {
                 Debug.Log("allQuestions: " + allQuestions.Count + " nämlich: " + allQuestions[0].name);
                 if(allQuestions[0] != null && allQuestions[0].transform.localScale == new Vector3(0, 0, 0))
                 {
+                    foreach (Transform child in allQuestions[0].transform)
+                    {
+                        if (child.CompareTag("Canvas"))
+                        {
+                            child.GetComponentInChildren<EventTrigger>().enabled = true;
+                        }
+                    }
                     allQuestions[0].transform.localScale = new Vector3(1, 1, 1);
-                    allQuestions[0].GetComponentInChildren<EventTrigger>().enabled = true;
+                    //allQuestions[0].GetComponent<MeshRenderer>().enabled = true;
+
                 }
             }
         }
@@ -247,7 +263,14 @@ public class FallingDeep : MonoBehaviour {
         }
 
         // sets color of the answer to green
-        GameObject.Find(canvasObj).GetComponentInChildren<Text>().color = Color.green;
+        foreach(Transform obj in thisQuestion)
+        {
+            if(obj.name.Equals(canvasObj))
+            {
+                obj.GetComponentInChildren<Text>().color = Color.green;
+            }
+        }
+        //GameObject.Find(canvasObj).GetComponentInChildren<Text>().color = Color.green;
     }
 
     // Gaze no longer on this object
@@ -259,7 +282,15 @@ public class FallingDeep : MonoBehaviour {
             correctAnswer = true;
             jump = false;
             timer = timerToAnswer = 0.0f;
-            GameObject.Find(canvasObj).GetComponentInChildren<Text>().color = new Color(206, 206, 206) ;
+            // resets color to black in a canvas of the current question
+            foreach (Transform obj in thisQuestion)
+            {
+                if (obj.name.Equals(canvasObj))
+                {
+                    obj.GetComponentInChildren<Text>().color = new Color(206, 206, 206);
+                }
+            }
+            //GameObject.Find(canvasObj).GetComponentInChildren<Text>().color = new Color(206, 206, 206) ;
             canvasObj = "Canvas";
             scholleObj = "Scholle";
         }
