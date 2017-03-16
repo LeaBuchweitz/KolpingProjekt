@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class CalculateJumpParab : MonoBehaviour {
 
@@ -19,9 +20,15 @@ public class CalculateJumpParab : MonoBehaviour {
     private GameObject landing;
     private GameObject endJump;
     private GameObject img;
-    private GameObject[] canvas;
+    //private GameObject[] canvas;
+
+    private List<Transform> canvas;
+
+    private Transform thisQuestion;
 
     private float timer;
+
+    private bool getCanvas;
     private bool disappear;
 
 	// Use this for initialization
@@ -41,38 +48,43 @@ public class CalculateJumpParab : MonoBehaviour {
 
         timer = 0.0f;
         disappear = false;
+        getCanvas = true;
+
+        thisQuestion = null;
+        canvas = new List<Transform>();
 		
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		
+
         // starts timer to delete question and answers
-        if(disappear)
+        if (disappear)
         {
             timer += Time.deltaTime;
+            getCanvasObjectsForDestroy();
         }
 
-        if(timer > 2.3f)
+        if (timer > 2.3f)
         {
-            // gets every component of the question and answers
-            canvas = GameObject.FindGameObjectsWithTag("Canvas");
-            img = GameObject.Find("BildSchattenfelderSimultan");
-            // deletes every question component
-            foreach(GameObject obj in canvas)
+            // destroys every canvas object from the current question
+            foreach (Transform child in canvas)
             {
-                Destroy(obj);
+                Destroy(child.gameObject);
             }
-            Destroy(img);
 
             // reset 
             disappear = false;
             timer = 0.0f;
+            canvas.Clear();
+            getCanvas = true;
         }
 	}
 
-    public void calculateLocalParab(Vector3 start, Vector3 end)
+    public void calculateLocalParab(Vector3 start, Vector3 end, Transform currentQuestion)
     {
+        thisQuestion = currentQuestion;
+
         //Debug.Log("Start: " + start + " Ende: " + end);
 
         // Richtungsvektor end - start
@@ -112,5 +124,27 @@ public class CalculateJumpParab : MonoBehaviour {
 
         // starts timer for begin to make the question and answers disappear
         disappear = true;
+    }
+
+    private void getCanvasObjectsForDestroy()
+    {
+        if(getCanvas)
+        {
+            // gets all canvas objects in current question + image
+            foreach (Transform child in thisQuestion)
+            {
+                if (child.CompareTag("Canvas"))
+                {
+                    child.GetComponent<EventTrigger>().enabled = false;
+                    canvas.Add(child);
+                    Debug.Log("In Disabled-Liste " + child.gameObject);
+                }
+                if (child.name.Equals("BildSchattenfelderSimultan"))
+                {
+                    canvas.Add(child);
+                }
+            }
+        }
+        getCanvas = false;
     }
 }
