@@ -8,6 +8,7 @@ public class FallingDeep : MonoBehaviour {
 
     private GameObject defaultY;
     private GameObject cam;
+    private GameObject fade;
     private GameObject[] schollen;
     private GameObject[] canvas;
     private List<GameObject> allQuestions;
@@ -17,7 +18,9 @@ public class FallingDeep : MonoBehaviour {
     private Vector3 camPosition;
     private Vector3 endJump;
     private Quaternion camRotation;
+    private Quaternion[] schollenRotation;
     private Transform thisQuestion;
+    private GameObject[] contrasts;
 
     private float yPosition;
     private float timer;
@@ -41,6 +44,8 @@ public class FallingDeep : MonoBehaviour {
 
         // reference to one Scholle
         defaultY = GameObject.Find("Start");
+        fade = GameObject.Find("Fading");
+        contrasts = GameObject.FindGameObjectsWithTag("Kontrast");
 
         // gets reference and position to cam
         cam = GameObject.Find("CardboardMain");
@@ -69,9 +74,16 @@ public class FallingDeep : MonoBehaviour {
                 }
             }
             allQuestions[i].GetComponent<Transform>().localScale = new Vector3 (0,0,0);
-            Debug.Log(i);
-            //allQuestions[i].GetComponent<MeshRenderer>().enabled = false;
         }
+
+        // makes all contrasts invisible 
+        for (int i = 0; i < contrasts.Length; i++)
+        {
+            contrasts[i].GetComponent<Transform>().localScale = new Vector3(0, 0, 0);
+        }
+
+        // fades in first question and tells intro
+        beginning();
 
     }
 
@@ -118,9 +130,17 @@ public class FallingDeep : MonoBehaviour {
         {
             foreach (GameObject objct in schollen)
             {
+                // sets color of the answer to red
+                foreach (Transform obj in thisQuestion)
+                {
+                    if (obj.name.Equals(canvasObj))
+                    {
+                        obj.GetComponentInChildren<Text>().color = Color.red;
+                    }
+                }
+
                 objct.GetComponent<Rigidbody>().isKinematic = false;
                 Debug.Log("Fällt: " + objct);
-                GameObject.Find(canvasObj).GetComponentInChildren<Text>().color = Color.red;
             }
         }
 
@@ -131,17 +151,27 @@ public class FallingDeep : MonoBehaviour {
             {
                 schollen[i].GetComponent<Rigidbody>().isKinematic = true;
                 schollen[i].GetComponent<Transform>().position = schollenPosition[i];
+                schollen[i].GetComponent<Transform>().rotation = schollenRotation[i];
             }
 
             // resets cam position and isKinematic to stop it from falling
+            Vector3 overStart = new Vector3(0, 0.5f, 0);
             cam.GetComponent<Rigidbody>().isKinematic = true;
-            cam.GetComponent<Transform>().position = defaultY.GetComponent<Transform>().position;
+            cam.GetComponent<Transform>().position = defaultY.GetComponent<Transform>().position + overStart;
             cam.GetComponent<Transform>().rotation = camRotation;
+
+            // sets color of the answer back to normal
+            foreach (Transform obj in thisQuestion)
+            {
+                if (obj.name.Equals(canvasObj))
+                {
+                    obj.GetComponentInChildren<Text>().color = new Color(206, 206, 206);
+                }
+            }
 
             reset();
             canvasObj = "Canvas";
 
-            // TODO!
             resetGame();
         }
         //________________________________________________________________________________________________________________________________________________________________________________________________
@@ -155,6 +185,15 @@ public class FallingDeep : MonoBehaviour {
         {
             // calls function in CalculateJumpParab to animate jump to correct Scholle
             cam.GetComponent<CalculateJumpParab>().calculateLocalParab(camPosition, new Vector3(endJump.x, endJump.y + 0.5f, endJump.z), thisQuestion);
+
+            // sets color of the answer back to normal
+            foreach (Transform obj in thisQuestion)
+            {
+                if (obj.name.Equals(canvasObj))
+                {
+                    obj.GetComponentInChildren<Text>().color = new Color(206, 206, 206);
+                }
+            }
 
             reset();
             canvasObj = "Canvas";
@@ -173,9 +212,8 @@ public class FallingDeep : MonoBehaviour {
                             child.GetComponentInChildren<EventTrigger>().enabled = true;
                         }
                     }
+                    // get bestimmt net
                     allQuestions[0].transform.localScale = new Vector3(1, 1, 1);
-                    //allQuestions[0].GetComponent<MeshRenderer>().enabled = true;
-
                 }
             }
         }
@@ -207,6 +245,7 @@ public class FallingDeep : MonoBehaviour {
         } else
         {
             Debug.Log("Game is over and won!");
+            endOfGame();
         }
 
         // gets all possible Schollen everytime gravityOn is called
@@ -227,9 +266,11 @@ public class FallingDeep : MonoBehaviour {
         {
             // gets all positions to all Schollen
             schollenPosition = new Vector3[schollen.Length];
+            schollenRotation = new Quaternion[schollen.Length];
             for (int i = 0; i < schollen.Length; i++)
             {
                 schollenPosition[i] = schollen[i].GetComponent<Transform>().position;
+                schollenRotation[i] = schollen[i].GetComponent<Transform>().rotation;
             }
         }
 
@@ -270,7 +311,6 @@ public class FallingDeep : MonoBehaviour {
                 obj.GetComponentInChildren<Text>().color = Color.green;
             }
         }
-        //GameObject.Find(canvasObj).GetComponentInChildren<Text>().color = Color.green;
     }
 
     // Gaze no longer on this object
@@ -290,17 +330,70 @@ public class FallingDeep : MonoBehaviour {
                     obj.GetComponentInChildren<Text>().color = new Color(206, 206, 206);
                 }
             }
-            //GameObject.Find(canvasObj).GetComponentInChildren<Text>().color = new Color(206, 206, 206) ;
+
             canvasObj = "Canvas";
             scholleObj = "Scholle";
         }
     }
 
-    public void resetGame()
+    private void resetGame()
     {
         // reference to all question prefabs
         allQuestions = new List<GameObject> { GameObject.Find("1-Hell-Dunkel-Scholle-Frage-Antw-Bild"), GameObject.Find("2-Komplemantaer-Scholle-Frage-Antw-Bild"), GameObject.Find("3-Simultan-Scholle-Frage-Antw-Bild") }; //,
-                                            // GameObject.Find("4-Unbunt-Bunt-Scholle-Frage-Antw-Bild"), GameObject.Find("5-Farbe-an-sich-Scholle-Frage-Antw-Bild"), GameObject.Find("6-Warm-Kalt-Scholle-Frage-Antw-Bild"),
-                                            // GameObject.Find("7-Quantitaet-Scholle-Frage-Antw-Bild"), GameObject.Find("8-Qualitaet-Scholle-Frage-Antw-Bild") };
+                                              // GameObject.Find("4-Unbunt-Bunt-Scholle-Frage-Antw-Bild"), GameObject.Find("5-Farbe-an-sich-Scholle-Frage-Antw-Bild"), GameObject.Find("6-Warm-Kalt-Scholle-Frage-Antw-Bild"),
+                                              // GameObject.Find("7-Quantitaet-Scholle-Frage-Antw-Bild"), GameObject.Find("8-Qualitaet-Scholle-Frage-Antw-Bild") };
+
+        // sets timer and begin of timer
+        timer = timerToAnswer = timerFall = 0.0f;
+        correctAnswer = true;
+        jump = false;
+        fallingStarted = false;
+        canvasObj = "Canvas";
+        scholleObj = "Scholle";
+
+        schollenHilfe = new List<GameObject>();
+        thisQuestion = null;
+
+        // reset question 1 to visible and eventtrigger enabled
+        foreach (Transform child in allQuestions[0].transform)
+        {
+            if(child.GetComponent<Canvas>() != null)
+            {
+                child.GetComponent<EventTrigger>().enabled = true;
+            } else
+            {
+                child.GetComponent<Renderer>().enabled = true;
+            }
+        }
+        allQuestions[0].transform.localScale = new Vector3(1, 1, 1);
+    }
+
+    private void beginning()
+    {
+        /* DOES NOT WORK BECAUSE CANVAS HAS NO MATERIAL
+        // gets all children which should be faded
+        List<GameObject> objHelp = new List<GameObject>();
+        foreach(Transform child in allQuestions[0].GetComponent<Transform>())
+        {
+            objHelp.Add(child.gameObject);
+        }
+
+        // sets all parameters for fading
+        GameObject[] obj = objHelp.ToArray();
+        Color color = obj[0].GetComponent<Renderer>().material.color;
+        int[] fadingMode = new int[] { 2, 1 }; 
+        */
+
+        GameObject[] obj = new GameObject[] { GameObject.Find("Fallroehreneu") };
+        Color color = obj[0].GetComponent<Renderer>().material.color;
+        int[] fadingMode = new int[] { 1 };
+
+        // fades in the first question
+        fade.GetComponent<Fading>().NowFade(obj, color, fadingMode, 1);
+    }
+
+    private void endOfGame()
+    {
+        // in die mitte zurück springen
     }
 }

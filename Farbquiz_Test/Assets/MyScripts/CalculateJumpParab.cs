@@ -20,7 +20,6 @@ public class CalculateJumpParab : MonoBehaviour {
     private GameObject landing;
     private GameObject endJump;
     private GameObject img;
-    //private GameObject[] canvas;
 
     private List<Transform> canvas;
 
@@ -70,8 +69,15 @@ public class CalculateJumpParab : MonoBehaviour {
             // destroys every canvas object from the current question
             foreach (Transform child in canvas)
             {
-                Destroy(child.gameObject);
+                if(child.GetComponent<Canvas>() != null)
+                {
+                    child.GetComponent<EventTrigger>().enabled = false;
+                } else
+                {
+                    child.GetComponent<Renderer>().enabled = false;
+                }
             }
+            thisQuestion.GetComponent<Transform>().localScale = new Vector3(0, 0, 0);
 
             // reset 
             disappear = false;
