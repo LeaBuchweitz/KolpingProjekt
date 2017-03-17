@@ -21,14 +21,15 @@ public class CalculateJumpParab : MonoBehaviour {
     private GameObject endJump;
     private GameObject img;
 
-    private List<Transform> canvas;
+    private List<Transform> questionElems;
 
     private Transform thisQuestion;
 
     private float timer;
 
-    private bool getCanvas;
     private bool disappear;
+
+    private string scholle;
 
 	// Use this for initialization
 	void Start () {
@@ -47,10 +48,9 @@ public class CalculateJumpParab : MonoBehaviour {
 
         timer = 0.0f;
         disappear = false;
-        getCanvas = true;
 
         thisQuestion = null;
-        canvas = new List<Transform>();
+        questionElems = new List<Transform>();
 		
 	}
 	
@@ -61,41 +61,43 @@ public class CalculateJumpParab : MonoBehaviour {
         if (disappear)
         {
             timer += Time.deltaTime;
-            getCanvasObjectsForDestroy();
         }
 
         if (timer > 2.3f)
         {
-            // destroys every canvas object from the current question
-            foreach (Transform child in canvas)
+            // reset 
+            disappear = false;
+            timer = 0.0f;
+
+            // destroys every questionElems object from the current question
+            foreach (Transform child in thisQuestion)
             {
+                // keeps correct scholle
+                if(child.name.Equals(scholle))
+                {
+                    continue;
+                }
                 if(child.GetComponent<Canvas>() != null)
                 {
-                    child.GetComponent<EventTrigger>().enabled = false;
+                    child.GetComponent<Canvas>().enabled = false;
                 } else
                 {
                     child.GetComponent<Renderer>().enabled = false;
                 }
             }
-            thisQuestion.GetComponent<Transform>().localScale = new Vector3(0, 0, 0);
-
-            // reset 
-            disappear = false;
-            timer = 0.0f;
-            canvas.Clear();
-            getCanvas = true;
         }
 	}
 
-    public void calculateLocalParab(Vector3 start, Vector3 end, Transform currentQuestion)
+    public void calculateLocalParab(Vector3 start, Vector3 end, Transform currentQuestion, string scholle)
     {
         thisQuestion = currentQuestion;
+        this.scholle = scholle;
 
-        //Debug.Log("Start: " + start + " Ende: " + end);
+        Debug.Log("Start: " + start + " Ende: " + end);
 
         // Richtungsvektor end - start
-        Vector3 direction = new Vector3(end.x + start.x, end.y - start.y, end.z - start.z);
-        //Debug.Log("Richtungsvektor: " + direction);
+        Vector3 direction = new Vector3(Mathf.Abs(end.x) - Mathf.Abs(start.x), Mathf.Abs(end.y) - Mathf.Abs(start.y), Mathf.Abs(end.z) - Mathf.Abs(start.z));
+        Debug.Log("Richtungsvektor: " + direction);
 
         // In die Knie gehen und von da aus springen
         down = new Vector3(start.x, start.y - 0.2f, start.z);
@@ -132,25 +134,5 @@ public class CalculateJumpParab : MonoBehaviour {
         disappear = true;
     }
 
-    private void getCanvasObjectsForDestroy()
-    {
-        if(getCanvas)
-        {
-            // gets all canvas objects in current question + image
-            foreach (Transform child in thisQuestion)
-            {
-                if (child.CompareTag("Canvas"))
-                {
-                    child.GetComponent<EventTrigger>().enabled = false;
-                    canvas.Add(child);
-                    Debug.Log("In Disabled-Liste " + child.gameObject);
-                }
-                if (child.name.Equals("BildSchattenfelderSimultan"))
-                {
-                    canvas.Add(child);
-                }
-            }
-        }
-        getCanvas = false;
-    }
+
 }
