@@ -1,4 +1,4 @@
 sceneSetups:
-- path: C:/Users/Lea.B/Documents/Unity/Bildwechsel_Kuppel/Assets/Touristen-Projekt-Basis.unity
+- path: Assets/FallingTest.unity
   isLoaded: 1
   isActive: 1
