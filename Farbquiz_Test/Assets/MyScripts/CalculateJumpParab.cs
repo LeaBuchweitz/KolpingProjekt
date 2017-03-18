@@ -82,7 +82,11 @@ public class CalculateJumpParab : MonoBehaviour {
                     child.GetComponent<Canvas>().enabled = false;
                 } else
                 {
-                    child.GetComponent<Renderer>().enabled = false;
+                    if (!child.CompareTag("Explanation"))
+                    {
+                        child.GetComponent<Renderer>().enabled = false;
+                        child.GetComponent<Collider>().enabled = false;
+                    }
                 }
             }
         }

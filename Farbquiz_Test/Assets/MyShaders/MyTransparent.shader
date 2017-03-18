@@ -18,6 +18,8 @@
 		SubShader{ Pass{
 			SetTexture[_MainTex]{ combine texture * constant ConstantColor[_Color] }
 
+
+
 	} }
 		}
 
