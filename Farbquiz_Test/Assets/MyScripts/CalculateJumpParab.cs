@@ -96,7 +96,7 @@ public class CalculateJumpParab : MonoBehaviour {
         Debug.Log("Start: " + start + " Ende: " + end);
 
         // Richtungsvektor end - start
-        Vector3 direction = new Vector3(Mathf.Abs(end.x) - Mathf.Abs(start.x), Mathf.Abs(end.y) - Mathf.Abs(start.y), Mathf.Abs(end.z) - Mathf.Abs(start.z));
+        Vector3 direction = new Vector3(end.x - start.x, end.y - start.y, end.z - start.z);
         Debug.Log("Richtungsvektor: " + direction);
 
         // In die Knie gehen und von da aus springen
