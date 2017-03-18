@@ -37,9 +37,9 @@ public class FallingDeep : MonoBehaviour {
 	void Start () {
 
         // reference to all question prefabs
-        allQuestions = new List<GameObject> { GameObject.Find("1-Hell-Dunkel-Scholle-Frage-Antw-Bild") , GameObject.Find("2-Komplemantaer-Scholle-Frage-Antw-Bild"), GameObject.Find("3-Simultan-Scholle-Frage-Antw-Bild") };//,
-            // GameObject.Find("4-Unbunt-Bunt-Scholle-Frage-Antw-Bild"), GameObject.Find("5-Farbe-an-sich-Scholle-Frage-Antw-Bild"), GameObject.Find("6-Warm-Kalt-Scholle-Frage-Antw-Bild"),
-            // GameObject.Find("7-Quantitaet-Scholle-Frage-Antw-Bild"), GameObject.Find("8-Qualitaet-Scholle-Frage-Antw-Bild") };
+        allQuestions = new List<GameObject> { GameObject.Find("1-Hell-Dunkel-Scholle-Frage-Antw-Bild"), GameObject.Find("2-Komplemantaer-Scholle-Frage-Antw-Bild"), GameObject.Find("3-Simultan-Scholle-Frage-Antw-Bild") ,
+                                              GameObject.Find("4-Unbunt-Bunt-Scholle-Frage-Antw-Bild"), GameObject.Find("5-Farbe-an-sich-Scholle-Frage-Antw-Bild"), GameObject.Find("6-Warm-Kalt-Scholle-Frage-Antw-Bild"),
+                                              GameObject.Find("7-Quantitaet-Scholle-Frage-Antw-Bild"), GameObject.Find("8-Qualitaet-Scholle-Frage-Antw-Bild") };
 
         // reference to one Scholle
         defaultY = GameObject.Find("Start");
@@ -356,9 +356,9 @@ public class FallingDeep : MonoBehaviour {
     private void resetGame()
     {
         // reference to all question prefabs
-        allQuestions = new List<GameObject> { GameObject.Find("1-Hell-Dunkel-Scholle-Frage-Antw-Bild"), GameObject.Find("2-Komplemantaer-Scholle-Frage-Antw-Bild"), GameObject.Find("3-Simultan-Scholle-Frage-Antw-Bild") }; //,
-                                              // GameObject.Find("4-Unbunt-Bunt-Scholle-Frage-Antw-Bild"), GameObject.Find("5-Farbe-an-sich-Scholle-Frage-Antw-Bild"), GameObject.Find("6-Warm-Kalt-Scholle-Frage-Antw-Bild"),
-                                              // GameObject.Find("7-Quantitaet-Scholle-Frage-Antw-Bild"), GameObject.Find("8-Qualitaet-Scholle-Frage-Antw-Bild") };
+        allQuestions = new List<GameObject> { GameObject.Find("1-Hell-Dunkel-Scholle-Frage-Antw-Bild"), GameObject.Find("2-Komplemantaer-Scholle-Frage-Antw-Bild"), GameObject.Find("3-Simultan-Scholle-Frage-Antw-Bild") ,
+                                              GameObject.Find("4-Unbunt-Bunt-Scholle-Frage-Antw-Bild"), GameObject.Find("5-Farbe-an-sich-Scholle-Frage-Antw-Bild"), GameObject.Find("6-Warm-Kalt-Scholle-Frage-Antw-Bild"),
+                                              GameObject.Find("7-Quantitaet-Scholle-Frage-Antw-Bild"), GameObject.Find("8-Qualitaet-Scholle-Frage-Antw-Bild") };
 
         // sets timer and begin of timer
         timer = timerToAnswer = timerFall = 0.0f;
@@ -392,19 +392,6 @@ public class FallingDeep : MonoBehaviour {
 
     private void beginning()
     {
-        /* DOES NOT WORK BECAUSE CANVAS HAS NO MATERIAL
-        // gets all children which should be faded
-        List<GameObject> objHelp = new List<GameObject>();
-        foreach(Transform child in allQuestions[0].GetComponent<Transform>())
-        {
-            objHelp.Add(child.gameObject);
-        }
-
-        // sets all parameters for fading
-        GameObject[] obj = objHelp.ToArray();
-        Color color = obj[0].GetComponent<Renderer>().material.color;
-        int[] fadingMode = new int[] { 2, 1 }; 
-        */
 
         GameObject[] obj = new GameObject[] { GameObject.Find("Fallroehreneu") };
         Color color = obj[0].GetComponent<Renderer>().material.color;
@@ -416,6 +403,8 @@ public class FallingDeep : MonoBehaviour {
 
     private void endOfGame()
     {
-        // in die mitte zurück springen
+        // jump back into the middle
+        cam.GetComponent<CalculateJumpParab>().calculateLocalParab(camPosition, new Vector3(defaultY.GetComponent<Transform>().position.x, defaultY.GetComponent<Transform>().position.y + 0.7f,
+            defaultY.GetComponent<Transform>().position.z), thisQuestion, scholleObj);
     }
 }
