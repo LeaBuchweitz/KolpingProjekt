@@ -37,6 +37,7 @@ public class FallingDeep : MonoBehaviour {
 	void Start () {
 
         // reference to all question prefabs
+        //GameObject.Find("1-Hell-Dunkel-Scholle-Frage-Antw-Bild"), GameObject.Find("2-Komplemantaer-Scholle-Frage-Antw-Bild"),
         allQuestions = new List<GameObject> { GameObject.Find("1-Hell-Dunkel-Scholle-Frage-Antw-Bild"), GameObject.Find("2-Komplemantaer-Scholle-Frage-Antw-Bild"), GameObject.Find("3-Simultan-Scholle-Frage-Antw-Bild") ,
                                               GameObject.Find("4-Unbunt-Bunt-Scholle-Frage-Antw-Bild"), GameObject.Find("5-Farbe-an-sich-Scholle-Frage-Antw-Bild"), GameObject.Find("6-Warm-Kalt-Scholle-Frage-Antw-Bild"),
                                               GameObject.Find("7-Quantitaet-Scholle-Frage-Antw-Bild"), GameObject.Find("8-Qualitaet-Scholle-Frage-Antw-Bild") };
@@ -74,6 +75,7 @@ public class FallingDeep : MonoBehaviour {
                 } else
                 {
                     child.GetComponent<Renderer>().enabled = false;
+                    child.GetComponent<Collider>().enabled = false;
                 }
             }
         }
@@ -128,6 +130,25 @@ public class FallingDeep : MonoBehaviour {
             reset();
         }
 
+        // start falling of all Schollen  _____________________________ FALLING __________________________________________________
+        if (timerFall > 2.0)
+        {
+            // sets color of the answer to red
+            foreach (Transform obj in thisQuestion)
+            {
+                if (obj.name.Equals(canvasObj))
+                {
+                    obj.GetComponentInChildren<Text>().color = Color.red;
+                }
+            }
+
+            // starts falling of every scholle
+            foreach (GameObject objct in schollen)
+            {
+                objct.GetComponent<Rigidbody>().isKinematic = false;
+            }
+        }
+
         // starts cam falling
         if (timerFall > 2.3)
         {
@@ -136,23 +157,6 @@ public class FallingDeep : MonoBehaviour {
             timerFall = 0.0f;
         }
 
-        // start falling of all Schollen  _____________________________ FALLING __________________________________________________
-        if (timerFall > 2.0)
-        {
-            foreach (GameObject objct in schollen)
-            {
-                // sets color of the answer to red
-                foreach (Transform obj in thisQuestion)
-                {
-                    if (obj.name.Equals(canvasObj))
-                    {
-                        obj.GetComponentInChildren<Text>().color = Color.red;
-                    }
-                }
-
-                objct.GetComponent<Rigidbody>().isKinematic = false;
-            }
-        }
 
         if (yPosition < -200) //_____________________________________________________ RESET ____________________________________________
         {
@@ -198,15 +202,16 @@ public class FallingDeep : MonoBehaviour {
             // sets color of the answer back to normal
             foreach (Transform obj in thisQuestion)
             {
-                if (obj.name.Equals(canvasObj))
-                {
-                    obj.GetComponentInChildren<Text>().color = new Color(206, 206, 206);
-                } 
                 // disables the eventTrigger
                 if(obj.GetComponent<Canvas>() != null)
                 {
                     obj.GetComponent<EventTrigger>().enabled = false;
                 }
+                
+                if (obj.name.Equals(canvasObj))
+                {
+                    obj.GetComponentInChildren<Text>().color = new Color(206, 206, 206);
+                } 
             }
 
             reset();
@@ -224,11 +229,13 @@ public class FallingDeep : MonoBehaviour {
                     {
                         if (child.CompareTag("Canvas"))
                         {
-                            child.GetComponent<EventTrigger>().enabled = true;
                             child.GetComponent<Canvas>().enabled = true;
+                            child.GetComponent<EventTrigger>().enabled = true;
                         } else
                         {
                             child.GetComponent<Renderer>().enabled = true;
+                            child.GetComponent<Collider>().enabled = true;
+
                         }
                     }
                 }

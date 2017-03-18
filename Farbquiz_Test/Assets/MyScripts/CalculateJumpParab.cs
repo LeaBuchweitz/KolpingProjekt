@@ -83,6 +83,7 @@ public class CalculateJumpParab : MonoBehaviour {
                 } else
                 {
                     child.GetComponent<Renderer>().enabled = false;
+                    child.GetComponent<Collider>().enabled = false;
                 }
             }
         }
