@@ -29,6 +29,7 @@ Unity/Farbquiz_Test/.vs
 *.booproj
 *.svd
 *.pidb
+*.dwlt
 /.vs/UnityVS.Prosodiya/v14
 
 # Unity3D generated meta files
