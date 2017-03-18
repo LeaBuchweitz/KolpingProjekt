@@ -31,6 +31,7 @@ public class FallingDeep : MonoBehaviour {
     private float timer2;
     private float timerToAnswer;
     private float explainIn;
+    private int onlyOnce;
 
     private bool correctAnswer;
     private bool jump;
@@ -63,14 +64,13 @@ public class FallingDeep : MonoBehaviour {
 
         // sets timer and begin of timer
         timer = timerToAnswer = timer2 = explainIn = 0.0f;
+        onlyOnce = 0;
         correctAnswer = true;
         jump = false;
         fallingStarted = false;
         explainStarted = nowExplain = false;
         canvasObj = "Canvas";
         scholleObj = "Scholle";
-        //light.GetComponent<Light>().intensity = 0.0f;
-        //light.GetComponent<Light>().color = Color.black;
 
         fade.GetComponent<AudioSource>().Play();
 
@@ -108,14 +108,15 @@ public class FallingDeep : MonoBehaviour {
     {
 
         // fades in all the sourrounding after intro
-        if (!fade.GetComponent<AudioSource>().isPlaying)
+        if (!fade.GetComponent<AudioSource>().isPlaying && onlyOnce == 0)
         {
+            onlyOnce = 1;
+
             GameObject[] obj = new GameObject[] { GameObject.Find("DunkleKugel") };
             int[] fadingMode = new int[] { 0 };
-            fade.GetComponent<Fading>().NowFade(obj, Color.black, fadingMode, 1);
+            Color color = obj[0].GetComponent<Renderer>().material.color;
+            fade.GetComponent<Fading>().NowFade(obj, color, fadingMode, 1);
 
-            // fades in the tube
-            beginning();
         }
 
         // checks y position if Schollen have already fallen deep enough
@@ -446,17 +447,6 @@ public class FallingDeep : MonoBehaviour {
                 child.GetComponent<Renderer>().enabled = true;
             }
         }
-    }
-
-    private void beginning()
-    { 
-
-        GameObject[] obj = new GameObject[] { GameObject.Find("Fallroehreneu") };
-        Color color = obj[0].GetComponent<Renderer>().material.color;
-        int[] fadingMode = new int[] { 1 };
-
-        // fades in the first question
-        fade.GetComponent<Fading>().NowFade(obj, color, fadingMode, 1);
     }
 
     private void explanation()
