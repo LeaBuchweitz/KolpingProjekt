@@ -29,8 +29,9 @@ public class Autowalk : MonoBehaviour
     public void goTowards(Vector3 pos)
     {
 
-        //Vector3 endpoint = new Vector3(2.192093e-07f, 0.8f, -4.5f);
-        Vector3 endpoint = new Vector3(pos.x -2f, pos.y + 0.1f, pos.z + 2f);
+        Vector3 endpoint = new Vector3(-3.3f, 0.8f, 3.3f);
+        Debug.Log("Endpunkt " + GameObject.Find("3-Grauflaeche fuer Simultan").GetComponent<Transform>().position);
+        //Vector3 endpoint = new Vector3(pos.x -2f, pos.y + 0.1f, pos.z + 2f);
 
         countUntil += Time.deltaTime;
         transform.position = Vector3.MoveTowards(transform.position, endpoint, countUntil * 0.1f);

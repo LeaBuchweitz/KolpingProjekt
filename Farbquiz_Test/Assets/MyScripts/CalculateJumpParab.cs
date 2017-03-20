@@ -73,7 +73,7 @@ public class CalculateJumpParab : MonoBehaviour {
             foreach (Transform child in thisQuestion)
             {
                 // keeps correct scholle
-                if(child.name.Equals(scholle))
+                if(child.name.Equals(scholle) && scholle.StartsWith("1"))
                 {
                     continue;
                 }
@@ -97,11 +97,11 @@ public class CalculateJumpParab : MonoBehaviour {
         thisQuestion = currentQuestion;
         this.scholle = scholle;
 
-        Debug.Log("Start: " + start + " Ende: " + end);
+        //Debug.Log("Start: " + start + " Ende: " + end);
 
         // Richtungsvektor end - start
         Vector3 direction = new Vector3(end.x - start.x, end.y - start.y, end.z - start.z);
-        Debug.Log("Richtungsvektor: " + direction);
+        //Debug.Log("Richtungsvektor: " + direction);
 
         // In die Knie gehen und von da aus springen
         down = new Vector3(start.x, start.y - 0.2f, start.z);

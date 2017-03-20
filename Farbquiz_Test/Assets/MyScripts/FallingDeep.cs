@@ -28,9 +28,10 @@ public class FallingDeep : MonoBehaviour {
 
     private float yPosition;
     private float timer;
-    private float timer2;
+    private float timerFall;
     private float timerToAnswer;
     private float explainIn;
+    private float timerExplanation;
     private int onlyOnce;
 
     private bool correctAnswer;
@@ -45,8 +46,9 @@ public class FallingDeep : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
+        //GameObject.Find("1-Hell-Dunkel-Scholle-Frage-Antw-Bild"),
+
         // reference to all question prefabs
-        //GameObject.Find("1-Hell-Dunkel-Scholle-Frage-Antw-Bild"), GameObject.Find("2-Komplemantaer-Scholle-Frage-Antw-Bild"),
         allQuestions = new List<GameObject> { GameObject.Find("1-Hell-Dunkel-Scholle-Frage-Antw-Bild"), GameObject.Find("2-Komplemantaer-Scholle-Frage-Antw-Bild"), GameObject.Find("3-Simultan-Scholle-Frage-Antw-Bild") ,
                                               GameObject.Find("4-Unbunt-Bunt-Scholle-Frage-Antw-Bild"), GameObject.Find("5-Farbe-an-sich-Scholle-Frage-Antw-Bild"), GameObject.Find("6-Warm-Kalt-Scholle-Frage-Antw-Bild"),
                                               GameObject.Find("7-Quantitaet-Scholle-Frage-Antw-Bild"), GameObject.Find("8-Qualitaet-Scholle-Frage-Antw-Bild") };
@@ -63,7 +65,7 @@ public class FallingDeep : MonoBehaviour {
         camRotation = cam.GetComponent<Transform>().rotation;
 
         // sets timer and begin of timer
-        timer = timerToAnswer = timer2 = explainIn = 0.0f;
+        timer = timerToAnswer = timerFall = explainIn = timerExplanation = 0.0f;
         onlyOnce = 0;
         correctAnswer = true;
         jump = false;
@@ -106,7 +108,7 @@ public class FallingDeep : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
-
+        /*
         // fades in all the sourrounding after intro
         if (!fade.GetComponent<AudioSource>().isPlaying && onlyOnce == 0)
         {
@@ -116,8 +118,8 @@ public class FallingDeep : MonoBehaviour {
             int[] fadingMode = new int[] { 0 };
             Color color = obj[0].GetComponent<Renderer>().material.color;
             fade.GetComponent<Fading>().NowFade(obj, color, fadingMode, 1);
-
         }
+        */
 
         // checks y position if Schollen have already fallen deep enough
         yPosition = cam.GetComponent<Transform>().position.y;
@@ -129,9 +131,14 @@ public class FallingDeep : MonoBehaviour {
             timer += Time.deltaTime;
         }
 
-        if (fallingStarted || explainStarted)
+        if (fallingStarted)
         {
-            timer2 += Time.deltaTime;
+            timerFall += Time.deltaTime;
+        }
+
+        if(explainStarted)
+        {
+            timerExplanation += Time.deltaTime;
         }
         
         // starts jump although answer is wrong __________________________________ STARTS FALLING WITH A JUMP _______________________________________________________
@@ -155,7 +162,7 @@ public class FallingDeep : MonoBehaviour {
         }
 
         // start falling of all Schollen  _____________________________ FALLING __________________________________________________
-        if (timer2 > 2.0)
+        if (timerFall > 2.0)
         {
             // sets color of the answer to red
             foreach (Transform obj in thisQuestion)
@@ -174,11 +181,11 @@ public class FallingDeep : MonoBehaviour {
         }
 
         // starts cam falling
-        if (timer2 > 2.3)
+        if (timerFall > 2.3)
         {
             cam.GetComponent<Rigidbody>().isKinematic = false;
             fallingStarted = false;
-            timer2 = 0.0f;
+            timerFall = 0.0f;
         }
 
 
@@ -221,7 +228,7 @@ public class FallingDeep : MonoBehaviour {
         if (timerToAnswer > 1.8f) //____________________________________ JUMPING _______________________________________
         {
             // calls function in CalculateJumpParab to animate jump to correct Scholle
-            cam.GetComponent<CalculateJumpParab>().calculateLocalParab(camPosition, new Vector3(endJump.x, endJump.y + 0.7f, endJump.z), thisQuestion, scholleObj);
+            cam.GetComponent<CalculateJumpParab>().calculateLocalParab(camPosition, new Vector3(endJump.x, endJump.y + 0.7f, endJump.z), thisQuestion, "1"+scholleObj);
 
             // sets color of the answer back to normal
             foreach (Transform obj in thisQuestion)
@@ -244,11 +251,11 @@ public class FallingDeep : MonoBehaviour {
             canvasObj = "Canvas";
         }
 
-        if(timer2 > 1.5f)
+        if(timerExplanation > 1.5f)
         {
 
             explainStarted = false;
-            timer2 = 0.0f;
+            timerExplanation = 0.0f;
 
             explanation();
 
@@ -297,6 +304,7 @@ public class FallingDeep : MonoBehaviour {
         //___________________________________________________________________________________________________________________________________________________________________________________________________
     }
 
+    // RESET GAME PARTS _________________________________________________________________
     public void reset()
     {
         // sets all values back to start
@@ -306,6 +314,7 @@ public class FallingDeep : MonoBehaviour {
         correctAnswer = true;
     }
 
+    // START GAZE ON ANSWER ______________________________________________________________
     // Gaze is on this Object
     public void gravityOn(string correct_Name)
     {
@@ -389,7 +398,7 @@ public class FallingDeep : MonoBehaviour {
         }
     }
 
-    // Gaze no longer on this object
+    // GAZE NO LONGER ON ANSWER __________________________________________________________________
     public void gravityOff()
     {
         // sets timer only back if Schollen are not falling
@@ -412,6 +421,7 @@ public class FallingDeep : MonoBehaviour {
         }
     }
 
+    // RESET GAME COMPLETELY ____________________________________________________________________
     private void resetGame()
     {
         // reference to all question prefabs
@@ -420,7 +430,7 @@ public class FallingDeep : MonoBehaviour {
                                               GameObject.Find("7-Quantitaet-Scholle-Frage-Antw-Bild"), GameObject.Find("8-Qualitaet-Scholle-Frage-Antw-Bild") };
 
         // sets timer and begin of timer
-        timer = timerToAnswer = timer2 = 0.0f;
+        timer = timerToAnswer = timerFall = 0.0f;
         correctAnswer = true;
         jump = false;
         fallingStarted = false;
@@ -437,11 +447,6 @@ public class FallingDeep : MonoBehaviour {
             {
                 child.GetComponent<EventTrigger>().enabled = true;
                 child.GetComponent<Canvas>().enabled = true;
-                // rescales the answer canvas
-                if(child.name.Length == 7)
-                {
-                    child.localScale = new Vector3(0.001187711f, 0.0006100911f, 0.001009358f);
-                }
             } else
             {
                 child.GetComponent<Renderer>().enabled = true;
@@ -449,6 +454,7 @@ public class FallingDeep : MonoBehaviour {
         }
     }
 
+    // EXPLAIN THE CORRECT ANSWER ____________________________________________________________________
     private void explanation()
     {
         Debug.Log("DIE ERKLÄRFRAGE IST: " + thisQuestion.name);
@@ -468,22 +474,23 @@ public class FallingDeep : MonoBehaviour {
         }
 
         // Explanation for the 3 Question
-        if(thisQuestion.name.StartsWith("3"))
+        if (thisQuestion.name.StartsWith("3"))
         {
             Debug.Log("Bin bei der 3. Frage");
             GameObject chess = null;
-            foreach(Transform obj in thisQuestion)
+            foreach (Transform obj in thisQuestion)
             {
-                if(obj.name.Equals("BildSchattenfelderSimultan"))
+                if (obj.name.Equals("BildSchattenfelderSimultan"))
                 {
                     chess = obj.gameObject;
-                    Debug.Log("ICH BIN CHESS: " + chess);
                 }
             }
             chess.gameObject.tag = "Explanation";
             chess.GetComponent<Renderer>().enabled = true;
             chess.GetComponent<Autowalk>().correctObjFocused = true;
             chess.GetComponent<Autowalk>().positionObject = chess.transform.position;
+
+            StartCoroutine(waitToFadeOut(new GameObject[] { chess, explainHelp[0] }, chess.GetComponent<Renderer>().material.color, new int[] { 2, 0 }));
         }
 
         // Fades in all the explanation elements
@@ -492,15 +499,20 @@ public class FallingDeep : MonoBehaviour {
             explain = explainHelp.ToArray();
             fadingMode = new int[] { 2, 1 };
             fade.GetComponent<Fading>().NowFade(explain, color, fadingMode, 1);
+            Debug.Log("ICH BIN NICHT 0");
         }
 
         // Explanation for the 2 Question
         if (thisQuestion.name.StartsWith("2"))
         {
             nowExplain = true;
+            Debug.Log("ICH Fang mit 2 an");
         }
+
+        Debug.Log("ICH BIN JETZT AM ENDE");
     }
 
+    // END OF THE GAME __________________________________________________________________________
     private void endOfGame()
     {
         // jump back into the middle
@@ -510,6 +522,7 @@ public class FallingDeep : MonoBehaviour {
         fade.GetComponent<AudioSource>().Play();
     }
 
+    // EXPLANATION FOR THE 2 QUESTION ____________________________________________________________
     private void explain2()
     {
         explainHelp.RemoveAt(1);
@@ -521,11 +534,14 @@ public class FallingDeep : MonoBehaviour {
         StartCoroutine(waitToFadeOut(new GameObject[] { GameObject.Find("2 Streifen Komplementaer Simultan") },color,fadingMode));
     }
 
+    // FADING OUT SOME ELEMENTS OF EXPLANATION ______________________________________________________
     IEnumerator waitToFadeOut(GameObject[] toFade, Color color, int[] fadingMode)
     {
         Debug.Log("Ich wurde aufgerufen");
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(2.5f);
         Debug.Log("2 Sek gewartet");
         fade.GetComponent<Fading>().NowFade(toFade, color, fadingMode, 1);
+        explainHelp.Clear();
+        StopCoroutine("waitToFadeOut");
     }
 }
