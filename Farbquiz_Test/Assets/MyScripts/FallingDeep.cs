@@ -9,7 +9,6 @@ public class FallingDeep : MonoBehaviour {
     private GameObject defaultY;
     private GameObject cam;
     private GameObject fade;
-    private GameObject light;
     private GameObject[] schollen;
     private GameObject[] explain;
     private List<GameObject> allQuestions;
@@ -47,17 +46,14 @@ public class FallingDeep : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
-        //GameObject.Find("1-Hell-Dunkel-Scholle-Frage-Antw-Bild"), GameObject.Find("2-Komplemantaer-Scholle-Frage-Antw-Bild"), 
-
         // reference to all question prefabs
-        allQuestions = new List<GameObject> { GameObject.Find("3-Simultan-Scholle-Frage-Antw-Bild") ,
-                                              GameObject.Find("4-Unbunt-Bunt-Scholle-Frage-Antw-Bild"), GameObject.Find("5-Farbe-an-sich-Scholle-Frage-Antw-Bild"), GameObject.Find("6-Warm-Kalt-Scholle-Frage-Antw-Bild"),
+        allQuestions = new List<GameObject> { GameObject.Find("1-Hell-Dunkel-Scholle-Frage-Antw-Bild"), GameObject.Find("2-Komplemantaer-Scholle-Frage-Antw-Bild"), GameObject.Find("3-Simultan-Scholle-Frage-Antw-Bild") ,
+                                              GameObject.Find("4-Unbunt-Bunt-Scholle-Frage-Antw-Bild"), GameObject.Find("5-Farbe-an-sich-Scholle-Frage-Antw-Bild"), GameObject.Find("6-Warm-Kalt-Scholle-Frage-Antw-Bild"),    
                                               GameObject.Find("7-Quantitaet-Scholle-Frage-Antw-Bild"), GameObject.Find("8-Qualitaet-Scholle-Frage-Antw-Bild") };
 
         // reference to one Scholle
         defaultY = GameObject.Find("Start");
         fade = GameObject.Find("Fading");
-        //light = GameObject.Find("Directional Light");
         contrasts = GameObject.FindGameObjectsWithTag("Kontrast");
 
         // gets reference and position to cam
@@ -76,6 +72,8 @@ public class FallingDeep : MonoBehaviour {
         scholleObj = "Scholle";
 
         fade.GetComponent<AudioSource>().Play();
+
+        GameObject.Find("Firework").GetComponent<ParticleSystem>().Stop();
 
         schollenHilfe = new List<GameObject>();
         explainHelp = new List<GameObject>();
@@ -110,7 +108,6 @@ public class FallingDeep : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
-        /*
         // fades in all the sourrounding after intro
         if (!fade.GetComponent<AudioSource>().isPlaying && onlyOnce == 0)
         {
@@ -121,7 +118,6 @@ public class FallingDeep : MonoBehaviour {
             Color color = obj[0].GetComponent<Renderer>().material.color;
             fade.GetComponent<Fading>().NowFade(obj, color, fadingMode, 1);
         }
-        */
 
         // checks y position if Schollen have already fallen deep enough
         yPosition = cam.GetComponent<Transform>().position.y;
@@ -262,13 +258,12 @@ public class FallingDeep : MonoBehaviour {
             explanation();
 
             // gets rid of the current question in the list and scales up the next
-            if (allQuestions != null)
+            if (allQuestions.Count != 0)
             {
                 allQuestions.RemoveAt(0);
-                Debug.Log("allQuestions: " + allQuestions.Count + " nämlich: " + allQuestions[0].name);
 
                 // next question is right beside, do not make the question directly appear
-                if (allQuestions[0] != null && (allQuestions[0].GetComponentInChildren<Renderer>().enabled == false || allQuestions[0].GetComponentInChildren<Canvas>().enabled == false) && !allQuestions[0].name.StartsWith("5"))
+                if (allQuestions.Count != 0 && (allQuestions[0].GetComponentInChildren<Renderer>().enabled == false || allQuestions[0].GetComponentInChildren<Canvas>().enabled == false) && !allQuestions[0].name.StartsWith("5"))
                 {
                     foreach (Transform child in allQuestions[0].transform)
                     {
@@ -287,7 +282,12 @@ public class FallingDeep : MonoBehaviour {
                         }
                     }
                 }
-            }
+                if(allQuestions.Count == 0)
+                {
+                    Debug.Log("You won the game!");
+                    StartCoroutine(endOfGame());
+                }
+            } 
         }
 
         //_________________________________________________________________________________________________________________________________________________________________________________________________
@@ -326,15 +326,11 @@ public class FallingDeep : MonoBehaviour {
         camRotation = cam.GetComponent<Transform>().rotation;
 
         // checks if there is another question in the list to answer if there isn't you won!
-        if (allQuestions != null)
+        if (allQuestions.Count != 0)
         {
             thisQuestion = allQuestions[0].transform;
             Debug.Log("Nächste Frage mit " + thisQuestion.name + " Object");
-        } else
-        {
-            Debug.Log("Game is over and won!");
-            endOfGame();
-        }
+        } 
 
         // gets all possible Schollen everytime gravityOn is called
         foreach(Transform child in thisQuestion)
@@ -372,7 +368,6 @@ public class FallingDeep : MonoBehaviour {
             // starts timerToAnswer to start jump
             jump = true;           
 
-            //Debug.Log("Wir können gleich springen");
         } else
         {
             // sets string of current object and starts begin for timer
@@ -441,7 +436,36 @@ public class FallingDeep : MonoBehaviour {
         scholleObj = "Scholle";
 
         schollenHilfe = new List<GameObject>();
-        thisQuestion = null;
+        explainHelp = new List<GameObject>();
+        helpForExpl = new List<GameObject>();
+
+        setPosBack();
+
+        // gives back a color to the explanation objects and disables the renderer
+        GameObject[] allExplanations = GameObject.FindGameObjectsWithTag("Explanation");
+        fade.GetComponent<Fading>().NowFade(allExplanations, allExplanations[0].GetComponent<Renderer>().material.color, new int[] { 2, 1 }, 1);
+
+        // resets the objects which hadn't "Explanation"-Tags before
+        GameObject.Find("3BildSchattenfelderSimultan").gameObject.tag = "Untagged";
+        GameObject.Find("A Mittlegrau Loesung").gameObject.tag = "Untagged";
+        GameObject.Find("B Warmweiß").gameObject.tag = "Untagged";
+        GameObject.Find("C Kaltes Schwarz").gameObject.tag = "Untagged";
+        GameObject.Find("6-B-violett-zur Frage").gameObject.tag = "Untagged";
+
+        for (int i = 0; i < allExplanations.Length; i++)
+        {
+            allExplanations[i].GetComponent<Renderer>().enabled = false;
+        }
+
+        // makes every correct scholle which we stood on invisible again
+        GameObject[] allSchollen = GameObject.FindGameObjectsWithTag("Scholle");
+        for (int i = 0; i < allExplanations.Length; i++)
+        {
+            if(!allSchollen[i].name.Equals("Start"))
+            {
+                allSchollen[i].GetComponent<Renderer>().enabled = false;
+            }
+        }
 
         // reset question 1 to visible and eventtrigger enabled
         foreach (Transform child in allQuestions[0].transform)
@@ -452,15 +476,23 @@ public class FallingDeep : MonoBehaviour {
                 child.GetComponent<Canvas>().enabled = true;
             } else
             {
-                child.GetComponent<Renderer>().enabled = true;
+                if (!child.CompareTag("Explanation"))
+                {
+                    child.GetComponent<Renderer>().enabled = true;
+                    child.GetComponent<Collider>().enabled = true;
+                }
             }
         }
+
+        thisQuestion = null;
+
     }
 
     // EXPLAIN THE CORRECT ANSWER ____________________________________________________________________
     private void explanation()
     {
-        Debug.Log("DIE ERKLÄRFRAGE IST: " + thisQuestion.name);
+
+        explainHelp = new List<GameObject>();
 
         Color color = Color.cyan;
         int[] fadingMode = null;
@@ -479,11 +511,10 @@ public class FallingDeep : MonoBehaviour {
         // Explanation for the 3 Question
         if (thisQuestion.name.StartsWith("3"))
         {
-            Debug.Log("Bin bei der 3. Frage");
             GameObject chess = null;
             foreach (Transform obj in thisQuestion)
             {
-                if (obj.name.Equals("BildSchattenfelderSimultan"))
+                if (obj.name.Equals("3BildSchattenfelderSimultan"))
                 {
                     chess = obj.gameObject;
                 }
@@ -493,6 +524,7 @@ public class FallingDeep : MonoBehaviour {
             chess.GetComponent<Autowalk>().correctObjFocused = true;
             chess.GetComponent<Autowalk>().endPoint = new Vector3(-3.3f, 0.8f, 3.3f);
             chess.GetComponent<Autowalk>().positionObject = chess.transform.position;
+            Debug.Log(chess.transform.position);
 
             StartCoroutine(waitToFadeOut(new GameObject[] { chess, explainHelp[0] }, chess.GetComponent<Renderer>().material.color, new int[] { 2, 0 }));
         }
@@ -523,33 +555,83 @@ public class FallingDeep : MonoBehaviour {
             StartCoroutine(explain4());
         }
 
+        //Explanation for Question 6
+        if(thisQuestion.name.StartsWith("6"))
+        {
+            GameObject violet = GameObject.Find("6-B-violett-zur Frage");
+
+            violet.gameObject.tag = "Explanation";
+            violet.GetComponent<Autowalk>().correctObjFocused = true;
+            violet.GetComponent<Autowalk>().endPoint = new Vector3(violet.transform.position.x-2.05f, violet.transform.position.y, violet.transform.position.z);
+            violet.GetComponent<Autowalk>().positionObject = violet.transform.position;
+
+            for(int i = 0; i < explainHelp.Count; i++) 
+            {
+                explainHelp[i].GetComponent<Transform>().position = new Vector3(explainHelp[i].GetComponent<Transform>().position.x - 2.0f, explainHelp[i].GetComponent<Transform>().position.y,
+                    explainHelp[i].GetComponent<Transform>().position.z);
+            }
+
+            explainHelp.Add(violet);
+
+            StartCoroutine(explain6(explainHelp,violet.GetComponent<Renderer>().material.color));
+        }
+
         // Fades in all the explanation elements
         if(explainHelp.Count != 0)
         {
             explain = explainHelp.ToArray();
             fadingMode = new int[] { 2, 1 };
             fade.GetComponent<Fading>().NowFade(explain, color, fadingMode, 1);
-            Debug.Log("ICH BIN NICHT 0");
         }
 
         // Explanation for the 2 Question
         if (thisQuestion.name.StartsWith("2"))
         {
             nowExplain = true;
-            Debug.Log("ICH Fang mit 2 an");
         }
-
-        Debug.Log("ICH BIN JETZT AM ENDE");
     }
 
     // END OF THE GAME __________________________________________________________________________
-    private void endOfGame()
+    private IEnumerator endOfGame()
     {
-        // jump back into the middle
-        cam.GetComponent<CalculateJumpParab>().calculateLocalParab(camPosition, new Vector3(defaultY.GetComponent<Transform>().position.x, defaultY.GetComponent<Transform>().position.y + 0.7f,
-            defaultY.GetComponent<Transform>().position.z), thisQuestion, scholleObj);
+        yield return new WaitForSeconds(2f);
 
+        // jump back into the middle
+        cam.GetComponent<CalculateJumpParab>().calculateLocalParab(cam.GetComponent<Transform>().position, GameObject.Find("Start").transform.position += new Vector3(0,0.8f,0), thisQuestion, scholleObj);
+
+        // get all elements with kind of renderer
+        Renderer[] allRenderers = GameObject.FindObjectsOfType<Renderer>();
+        Canvas[] allCanvas = GameObject.FindObjectsOfType<Canvas>();
+        List<GameObject> allObjectsToFade = new List<GameObject>();
+
+        for(int i = 0; i < allCanvas.Length; i++)
+        {
+            allCanvas[i].enabled = false;
+        }
+
+        for (int i = 0; i < allRenderers.Length; i++)
+        {
+            if(allRenderers[i].name.Equals("DunkleKugel"))
+            {
+                Destroy(allRenderers[i]);
+            } else
+            {
+                allObjectsToFade.Add(allRenderers[i].gameObject);
+            }
+        }
+
+        // fade out all objects
+        fade.GetComponent<Fading>().NowFade(allObjectsToFade.ToArray(), allRenderers[0].GetComponent<Renderer>().material.color, new int[] { 2, 0 }, 1);
+
+        // start new audio
+        AudioClip applause = (AudioClip)Resources.Load("applause3");
+        Debug.Log(applause);
+        fade.GetComponent<AudioSource>().clip = applause;
         fade.GetComponent<AudioSource>().Play();
+
+        GameObject.Find("Firework").GetComponent<ParticleSystem>().Play();
+
+        StopCoroutine("endOfGame");
     }
 
     // EXPLANATION FOR THE 2 QUESTION ____________________________________________________________
@@ -567,40 +649,106 @@ public class FallingDeep : MonoBehaviour {
     // EXPLANATION FOR THE 4 QUESTION _________________________________________________________________
     private IEnumerator explain4()
     {
-        yield return new WaitForSeconds(2f);
 
-        StartCoroutine(waitToFadeOut(helpForExpl.ToArray(), Color.black , null));
+        StartCoroutine(waitToFadeOut(helpForExpl.ToArray(), helpForExpl[0].GetComponent<Renderer>().material.color, new int[] { 2,0 }));
 
+        yield return new WaitForSeconds(4f);
 
-        // now fade in next question
+        // Question 5 is special because mixes together with Question 4 (has to fade in later) and color-dots and question have to appear before answers 
+        if(allQuestions[0].name.StartsWith("5"))
+                {
+                    foreach (Transform child in allQuestions[0].transform)
+                    {
+                        if (child.name.Equals("CanvasFrage"))
+                        {
+                            child.GetComponent<Canvas>().enabled = true;
+                        }
+                        if (child.CompareTag("questionDots"))
+                        {
+                            child.GetComponent<Renderer>().enabled = true;
+                            child.GetComponent<Collider>().enabled = true;
+                        }
+                    }
+                    StartCoroutine(question5Appear());
+                }
+
+        StopCoroutine("explain4");
+
+    }
+
+    // MAKES QUESTION 5 APPEAR IN CORRECT ORDER ___________________________________________________________
+    private IEnumerator question5Appear()
+    {
+        yield return new WaitForSeconds(3f);
+
         foreach (Transform child in allQuestions[0].transform)
         {
-            if (child.CompareTag("Canvas"))
+            if (child.name.Equals("CanvasA") || child.name.Equals("CanvasB") || child.name.Equals("CanvasC"))
             {
                 child.GetComponent<Canvas>().enabled = true;
                 child.GetComponent<EventTrigger>().enabled = true;
             }
-            else
+            if (child.GetComponent<Canvas>() == null)
             {
-                if (!child.CompareTag("Explanation"))
-                {
-                    child.GetComponent<Renderer>().enabled = true;
-                    child.GetComponent<Collider>().enabled = true;
-                }
+                child.GetComponent<Renderer>().enabled = true;
+                child.GetComponent<Collider>().enabled = true;
+            }
+            if(child.CompareTag("questionDots"))
+            {
+                child.GetComponent<Renderer>().enabled = false;
+                child.GetComponent<Collider>().enabled = false;
             }
         }
-        StopCoroutine("explain4");
+        StopCoroutine("question5Appear");
+    }
 
+    // EXPLANATION FOR THE 6 QUESTION _________________________________________________________________
+    private IEnumerator explain6(List<GameObject> obj, Color color)
+    {
+        yield return new WaitForSeconds(4f);
+
+        fade.GetComponent<Fading>().NowFade(obj.ToArray(), color, new int[] { 2, 0 }, 1);
     }
 
     // FADING OUT SOME ELEMENTS OF EXPLANATION ______________________________________________________
     IEnumerator waitToFadeOut(GameObject[] toFade, Color color, int[] fadingMode)
     {
-        Debug.Log("Ich wurde aufgerufen");
         yield return new WaitForSeconds(2.5f);
-        Debug.Log("2 Sek gewartet");
         fade.GetComponent<Fading>().NowFade(toFade, color, fadingMode, 1);
         explainHelp.Clear();
         StopCoroutine("waitToFadeOut");
+    }
+
+    private void setPosBack()
+    {
+
+        Debug.Log("Verkackte frage: "+thisQuestion.name);
+
+        if(!thisQuestion.name.StartsWith("1") && !thisQuestion.name.StartsWith("2") && !thisQuestion.name.StartsWith("3"))
+        {
+            // Question 3 set element back
+            GameObject.Find("3BildSchattenfelderSimultan").GetComponent<Transform>().position = new Vector3(-1.8f, 0.8f, 1.8f);
+
+            if(!thisQuestion.name.StartsWith("4"))
+            {
+                // Question 4 set element back
+                GameObject.Find("A Mittlegrau Loesung").GetComponent<Transform>().position -= new Vector3(1.7f,0,0);
+                GameObject.Find("B Warmweiß").GetComponent<Transform>().position -= new Vector3(1.7f, 0, 0);
+                GameObject.Find("C Kaltes Schwarz").GetComponent<Transform>().position -= new Vector3(1.7f, 0, 0);
+                GameObject.Find("4 zu Scholle B Warmweiß-neutralWeiß").GetComponent<Transform>().position -= new Vector3(1.7f, 0, 0);
+                GameObject.Find("4 zu Scholle C Kaltes Schwarz-neutrales Schwarz").GetComponent<Transform>().position -= new Vector3(1.7f, 0, 0);
+
+                if(!thisQuestion.name.StartsWith("5") && !thisQuestion.name.StartsWith("6"))
+                {
+                    // Question 6 set element back
+                    GameObject.Find("6-B-violett-zur Frage").GetComponent<Transform>().position += new Vector3(2.05f, 0f, 0f);
+                    GameObject.Find("6-zu-B-hellblau-zur-Antwort").GetComponent<Transform>().position += new Vector3(2.05f, 0f, 0f);
+                    GameObject.Find("6-zu-A-orangerot-zur-Antwort").GetComponent<Transform>().position += new Vector3(2.05f, 0f, 0f);
+                    GameObject.Find("6-C-violett-zur-Antwort").GetComponent<Transform>().position += new Vector3(2.05f, 0f, 0f);
+                    GameObject.Find("6-zu-C-hellblau-zur-Antwort").GetComponent<Transform>().position += new Vector3(2.05f, 0f, 0f);
+                    GameObject.Find("6-zu-C-orangerot-zur-Antwort").GetComponent<Transform>().position += new Vector3(2.05f, 0f, 0f);
+                }
+            }
+        }
     }
 }

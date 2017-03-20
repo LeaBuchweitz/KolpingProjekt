@@ -21,6 +21,10 @@ public class Autowalk : MonoBehaviour
             if (countUntil < 1)
             {
                 goTowards(endPoint);
+            } else
+            {
+                countUntil = 0;
+                correctObjFocused = false;
             }
         }
     } 
@@ -29,7 +33,6 @@ public class Autowalk : MonoBehaviour
     // Calculates the endpoint of the path and goes there
     public void goTowards(Vector3 pos)
     {
-
         countUntil += Time.deltaTime;
         transform.position = Vector3.MoveTowards(transform.position, pos, countUntil * 0.1f);
        

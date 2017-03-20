@@ -72,8 +72,15 @@ public class CalculateJumpParab : MonoBehaviour {
             // destroys every questionElems object from the current question
             foreach (Transform child in thisQuestion)
             {
+                char[] c = scholle.ToCharArray();
+                string firstLetter = c[0] + "";
+                string schollenName = "";
+                for(int i = 1; i < c.Length; i++)
+                {
+                    schollenName += c[i];
+                }
                 // keeps correct scholle
-                if(child.name.Equals(scholle) && scholle.StartsWith("1"))
+                if (child.name.Equals(schollenName) && firstLetter.Equals("1"))
                 {
                     continue;
                 }
