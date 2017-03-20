@@ -15,6 +15,7 @@ public class FallingDeep : MonoBehaviour {
     private List<GameObject> allQuestions;
     private List<GameObject> schollenHilfe;
     private List<GameObject> explainHelp;
+    private List<GameObject> helpForExpl;
 
     private Vector3[] schollenPosition;
     private Vector3 camPosition;
@@ -46,10 +47,10 @@ public class FallingDeep : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
-        //GameObject.Find("1-Hell-Dunkel-Scholle-Frage-Antw-Bild"),
+        //GameObject.Find("1-Hell-Dunkel-Scholle-Frage-Antw-Bild"), GameObject.Find("2-Komplemantaer-Scholle-Frage-Antw-Bild"), 
 
         // reference to all question prefabs
-        allQuestions = new List<GameObject> { GameObject.Find("1-Hell-Dunkel-Scholle-Frage-Antw-Bild"), GameObject.Find("2-Komplemantaer-Scholle-Frage-Antw-Bild"), GameObject.Find("3-Simultan-Scholle-Frage-Antw-Bild") ,
+        allQuestions = new List<GameObject> { GameObject.Find("3-Simultan-Scholle-Frage-Antw-Bild") ,
                                               GameObject.Find("4-Unbunt-Bunt-Scholle-Frage-Antw-Bild"), GameObject.Find("5-Farbe-an-sich-Scholle-Frage-Antw-Bild"), GameObject.Find("6-Warm-Kalt-Scholle-Frage-Antw-Bild"),
                                               GameObject.Find("7-Quantitaet-Scholle-Frage-Antw-Bild"), GameObject.Find("8-Qualitaet-Scholle-Frage-Antw-Bild") };
 
@@ -78,6 +79,7 @@ public class FallingDeep : MonoBehaviour {
 
         schollenHilfe = new List<GameObject>();
         explainHelp = new List<GameObject>();
+        helpForExpl = new List<GameObject>();
         thisQuestion = null;
 
         // makes every question apart of the first invisible
@@ -265,7 +267,8 @@ public class FallingDeep : MonoBehaviour {
                 allQuestions.RemoveAt(0);
                 Debug.Log("allQuestions: " + allQuestions.Count + " nämlich: " + allQuestions[0].name);
 
-                if (allQuestions[0] != null && (allQuestions[0].GetComponentInChildren<Renderer>().enabled == false || allQuestions[0].GetComponentInChildren<Canvas>().enabled == false))
+                // next question is right beside, do not make the question directly appear
+                if (allQuestions[0] != null && (allQuestions[0].GetComponentInChildren<Renderer>().enabled == false || allQuestions[0].GetComponentInChildren<Canvas>().enabled == false) && !allQuestions[0].name.StartsWith("5"))
                 {
                     foreach (Transform child in allQuestions[0].transform)
                     {
@@ -488,9 +491,36 @@ public class FallingDeep : MonoBehaviour {
             chess.gameObject.tag = "Explanation";
             chess.GetComponent<Renderer>().enabled = true;
             chess.GetComponent<Autowalk>().correctObjFocused = true;
+            chess.GetComponent<Autowalk>().endPoint = new Vector3(-3.3f, 0.8f, 3.3f);
             chess.GetComponent<Autowalk>().positionObject = chess.transform.position;
 
             StartCoroutine(waitToFadeOut(new GameObject[] { chess, explainHelp[0] }, chess.GetComponent<Renderer>().material.color, new int[] { 2, 0 }));
+        }
+
+        // Explanation for 4 Question
+        if(thisQuestion.name.StartsWith("4"))
+        {
+            GameObject answer = null;
+            foreach (Transform obj in thisQuestion)
+            {
+                if (obj.name.StartsWith("A ") || obj.name.StartsWith("B ") || obj.name.StartsWith("C "))
+                {
+                    answer = obj.gameObject;
+                    answer.gameObject.tag = "Explanation";
+                    answer.GetComponent<Autowalk>().correctObjFocused = true;
+                    answer.GetComponent<Autowalk>().endPoint = new Vector3(answer.transform.position.x + 1.7f, answer.transform.position.y, answer.transform.position.z);
+                    answer.GetComponent<Autowalk>().positionObject = answer.transform.position;
+                    helpForExpl.Add(obj.gameObject);
+                }
+            }
+            GameObject sol1 = GameObject.Find("4 zu Scholle B Warmweiß-neutralWeiß");
+            sol1.GetComponent<Transform>().position += new Vector3(1.7f,0,0);
+            helpForExpl.Add(sol1);
+            GameObject sol2 = GameObject.Find("4 zu Scholle C Kaltes Schwarz-neutrales Schwarz");
+            sol2.GetComponent<Transform>().position += new Vector3(1.7f,0, 0);
+            helpForExpl.Add(sol2);
+
+            StartCoroutine(explain4());
         }
 
         // Fades in all the explanation elements
@@ -532,6 +562,35 @@ public class FallingDeep : MonoBehaviour {
         fade.GetComponent<Fading>().NowFade(explain, color, fadingMode, 1);
 
         StartCoroutine(waitToFadeOut(new GameObject[] { GameObject.Find("2 Streifen Komplementaer Simultan") },color,fadingMode));
+    }
+
+    // EXPLANATION FOR THE 4 QUESTION _________________________________________________________________
+    private IEnumerator explain4()
+    {
+        yield return new WaitForSeconds(2f);
+
+        StartCoroutine(waitToFadeOut(helpForExpl.ToArray(), Color.black , null));
+
+
+        // now fade in next question
+        foreach (Transform child in allQuestions[0].transform)
+        {
+            if (child.CompareTag("Canvas"))
+            {
+                child.GetComponent<Canvas>().enabled = true;
+                child.GetComponent<EventTrigger>().enabled = true;
+            }
+            else
+            {
+                if (!child.CompareTag("Explanation"))
+                {
+                    child.GetComponent<Renderer>().enabled = true;
+                    child.GetComponent<Collider>().enabled = true;
+                }
+            }
+        }
+        StopCoroutine("explain4");
+
     }
 
     // FADING OUT SOME ELEMENTS OF EXPLANATION ______________________________________________________
