@@ -43,8 +43,11 @@ public class FallingDeep : MonoBehaviour {
     private string canvasObj;
     private string scholleObj;
 
-	// Use this for initialization
-	void Start () {
+    private List<Color> colorsForSetBack;
+
+
+    // Use this for initialization
+    void Start () {
 
         // reference to all question prefabs
         allQuestions = new List<GameObject> { GameObject.Find("1-Hell-Dunkel-Scholle-Frage-Antw-Bild"), GameObject.Find("2-Komplemantaer-Scholle-Frage-Antw-Bild"), GameObject.Find("3-Simultan-Scholle-Frage-Antw-Bild") ,
@@ -80,8 +83,16 @@ public class FallingDeep : MonoBehaviour {
         helpForExpl = new List<GameObject>();
         thisQuestion = null;
 
+        GameObject[] allExplanations = GameObject.FindGameObjectsWithTag("Explanation");
+        colorsForSetBack = new List<Color>();
+
+        for(int i = 0; i < allExplanations.Length; i++)
+        {
+            colorsForSetBack.Add(allExplanations[i].GetComponent<Renderer>().material.color);
+        }
+
         // makes every question apart of the first invisible
-        for(int i = 1; i < allQuestions.Count; i++) 
+        for (int i = 1; i < allQuestions.Count; i++) 
         {
             foreach(Transform child in allQuestions[i].transform)
             {
@@ -443,7 +454,7 @@ public class FallingDeep : MonoBehaviour {
 
         // gives back a color to the explanation objects and disables the renderer
         GameObject[] allExplanations = GameObject.FindGameObjectsWithTag("Explanation");
-        fade.GetComponent<Fading>().NowFade(allExplanations, allExplanations[0].GetComponent<Renderer>().material.color, new int[] { 2, 1 }, 1);
+        fade.GetComponent<Fading>().NowFade(allExplanations, colorsForSetBack[0], new int[] { 2, 1 }, 1);
 
         // resets the objects which hadn't "Explanation"-Tags before
         GameObject.Find("3BildSchattenfelderSimultan").gameObject.tag = "Untagged";
@@ -451,6 +462,7 @@ public class FallingDeep : MonoBehaviour {
         GameObject.Find("B Warmweiß").gameObject.tag = "Untagged";
         GameObject.Find("C Kaltes Schwarz").gameObject.tag = "Untagged";
         GameObject.Find("6-B-violett-zur Frage").gameObject.tag = "Untagged";
+
 
         for (int i = 0; i < allExplanations.Length; i++)
         {
@@ -503,7 +515,8 @@ public class FallingDeep : MonoBehaviour {
                 explainHelp.Add(child.gameObject);
                 Debug.Log(child.name);
                 child.GetComponent<Renderer>().enabled = true;
-                color = child.GetComponent<Renderer>().material.color;
+                //color = child.GetComponent<Renderer>().material.color;
+                color = Color.white;
                 child.GetComponent<Renderer>().material.color = Color.clear;
             }
         }
